@@ -1,6 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Report
 from .forms import ReportForm
+
+
+# HOME (halaman awal)
+def home(request):
+    return render(request, 'main_app/home.html')
+
+
+# READ (tampilkan semua data)
+def report_list(request):
+    reports = Report.objects.all()
+    return render(request, 'main_app/report_list.html', {'reports': reports})
 
 
 # CREATE
@@ -16,15 +27,9 @@ def add_report(request):
     return render(request, 'main_app/add_report.html', {'form': form})
 
 
-# READ
-def report_list(request):
-    reports = Report.objects.all()
-    return render(request, 'main_app/report_list.html', {'reports': reports})
-
-
 # UPDATE
 def update_report(request, id):
-    report = Report.objects.get(id=id)
+    report = get_object_or_404(Report, id=id)
 
     if request.method == "POST":
         form = ReportForm(request.POST, instance=report)
@@ -39,6 +44,10 @@ def update_report(request, id):
 
 # DELETE
 def delete_report(request, id):
-    report = Report.objects.get(id=id)
-    report.delete()
-    return redirect('report_list')
+    report = get_object_or_404(Report, id=id)
+
+    if request.method == "POST":
+        report.delete()
+        return redirect('report_list')
+
+    return render(request, 'main_app/delete.html', {'report': report})
