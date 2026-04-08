@@ -2,21 +2,54 @@
 
 <a href="{% url 'add_report' %}">Tambah Laporan</a>
 
-<table border="1">
-    <tr>
-        <th>Judul</th>
-        <th>Isi</th>
-        <th>Aksi</th>
-    </tr>
+<hr>
 
-    {% for report in reports %}
-    <tr>
-        <td>{{ report.title }}</td>
-        <td>{{ report.description }}</td>
-        <td>
-            <a href="{% url 'update_report' report.id %}">Edit</a>
-            <a href="{% url 'delete_report' report.id %}">Hapus</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% for report in reports %}
+    <div style="border:1px solid black; padding:10px; margin:10px;">
+        
+        <h3>
+            <a href="{% url 'report_detail' report.id %}">
+                {{ report.title }}
+            </a>
+        </h3>
+        
+        <p><b>Category:</b> {{ report.category }}</p>
+        <p><b>Description:</b> {{ report.description }}</p>
+        <p><b>Location:</b> {{ report.location }}</p>
+        <p><b>Status:</b> {{ report.status|title }}</p>
+
+        <p><b>Created at:</b> {{ report.created_at|date:"d M Y H:i" }}</p>
+
+        <!-- WORKFLOW -->
+        {% if report.status == 'REPORTED' %}
+            <form method="POST" action="{% url 'update_status' report.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="VERIFIED">
+                <button type="submit">Verifikasi</button>
+            </form>
+
+        {% elif report.status == 'VERIFIED' %}
+            <form method="POST" action="{% url 'update_status' report.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="IN_PROGRESS">
+                <button type="submit">Proses</button>
+            </form>
+
+        {% elif report.status == 'IN_PROGRESS' %}
+            <form method="POST" action="{% url 'update_status' report.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="RESOLVED">
+                <button type="submit">Selesai</button>
+            </form>
+        {% endif %}
+
+        <br>
+
+        <a href="{% url 'update_report' report.id %}">Update</a> |
+        <a href="{% url 'delete_report' report.id %}">Delete</a>
+
+    </div>
+
+{% empty %}
+    <p>Belum ada laporan</p>
+{% endfor %}

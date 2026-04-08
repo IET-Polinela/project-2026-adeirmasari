@@ -1,10 +1,18 @@
 from django.urls import path
-from . import views
+from .views import (
+    ReportListView,
+    ReportDetailView,
+    ReportCreateView,
+    ReportUpdateView,
+    ReportDeleteView,
+    ReportUpdateStatusView
+)
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('reports/', views.report_list, name='report_list'),
-    path('add/', views.add_report, name='add_report'),
-    path('update/<int:id>/', views.update_report, name='update_report'),
-    path('delete/<int:id>/', views.delete_report, name='delete_report'),
+    path('', ReportListView.as_view(), name='report_list'),
+    path('add/', ReportCreateView.as_view(), name='add_report'),
+    path('<int:pk>/', ReportDetailView.as_view(), name='report_detail'),
+    path('update/<int:pk>/', ReportUpdateView.as_view(), name='update_report'),
+    path('delete/<int:pk>/', ReportDeleteView.as_view(), name='delete_report'),
+    path('status/<int:pk>/', ReportUpdateStatusView.as_view(), name='update_status'),
 ]
