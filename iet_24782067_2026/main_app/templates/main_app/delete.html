@@ -3,21 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Hapus Laporan</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f6fa;
+        }
+
+        .card {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        h2 {
+            color: #c0392b;
+        }
+
+        p {
+            color: #2c3e50;
+        }
+
+        .title {
+            font-size: 18px;
+            margin: 15px 0;
+        }
+
+        .actions {
+            margin-top: 25px;
+        }
+
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #c0392b;
+        }
+
+        .cancel {
+            display: inline-block;
+            margin-left: 10px;
+            text-decoration: none;
+            background: #7f8c8d;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .cancel:hover {
+            background: #616a6b;
+        }
+    </style>
 </head>
 <body>
 
-    <h2>Konfirmasi Hapus</h2>
+<div class="card">
 
-    <p>
-        Apakah Anda yakin ingin menghapus laporan:
-        <strong>{{ report }}</strong> ?
-    </p>
+    <h2>⚠ Konfirmasi Hapus</h2>
 
-    <form method="post">
+    <p>Apakah kamu yakin ingin menghapus laporan berikut?</p>
+
+    <p class="title"><b>{{ report.title }}</b></p>
+
+    <form method="POST">
         {% csrf_token %}
-        <button type="submit">Ya, Hapus</button>
-        <a href="{% url 'report_list' %}">Batal</a>
+        <div class="actions">
+            <button type="submit">🗑 Ya, Hapus</button>
+            <a href="{% url 'report_list' %}" class="cancel">Batal</a>
+        </div>
     </form>
+
+</div>
 
 </body>
 </html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Laporan</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f0f3f7;
+        }
+
+        .card {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            margin: 0;
+            color: #34495e;
+        }
+
+        .actions a {
+            text-decoration: none;
+            padding: 8px 14px;
+            margin-left: 5px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .edit {
+            background: #f39c12;
+        }
+
+        .delete {
+            background: #e74c3c;
+        }
+
+        .content p {
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .reported { background: #7f8c8d; }
+        .verified { background: #3498db; }
+        .progress { background: #f39c12; }
+        .resolved { background: #2ecc71; }
+
+        .back {
+            display: inline-block;
+            margin-top: 25px;
+            text-decoration: none;
+            background: #7f8c8d;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="header">
+        <h3>{{ report.title }}</h3>
+        <div class="actions">
+            <a href="{% url 'update_report' report.id %}" class="edit">Edit</a>
+            <a href="{% url 'delete_report' report.id %}" class="delete">Hapus</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="content">
+        <p><b>Category:</b> {{ report.category }}</p>
+        <p><b>Description:</b><br>{{ report.description }}</p>
+        <p><b>Location:</b> {{ report.location }}</p>
+
+        <p>
+            <b>Status:</b>
+            {% if report.status == 'REPORTED' %}
+                <span class="badge reported">Reported</span>
+            {% elif report.status == 'VERIFIED' %}
+                <span class="badge verified">Verified</span>
+            {% elif report.status == 'IN_PROGRESS' %}
+                <span class="badge progress">In Progress</span>
+            {% else %}
+                <span class="badge resolved">Resolved</span>
+            {% endif %}
+        </p>
+
+        <p><b>Created at:</b> {{ report.created_at|date:"d M Y H:i" }}</p>
+    </div>
+
+    <a href="{% url 'report_list' %}" class="back">⬅ Kembali ke Daftar Laporan</a>
+
+</div>
+
+</body>
+</html>
