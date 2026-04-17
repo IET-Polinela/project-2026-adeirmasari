@@ -1,92 +1,26 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Laporan</title>
+{% extends 'base.html' %}
 
-    <style>
-        body {
-            margin: 0;
-            padding: 40px;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #eef2f7;
-        }
+{% block title %}Edit Laporan{% endblock %}
 
-        .card {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
+{% block content %}
+<div class="card mx-auto" style="max-width:700px;">
+    <div class="card-body">
 
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 25px;
-        }
+        <h2 class="text-center mb-4">✏ Edit Laporan</h2>
 
-        form p {
-            margin-bottom: 15px;
-        }
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
 
-        label {
-            font-weight: bold;
-            color: #34495e;
-        }
+            <button class="btn btn-warning w-100">
+                Update Laporan
+            </button>
+        </form>
 
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
+        <a href="{% url 'report_list' %}" class="btn btn-secondary mt-3 w-100">
+            ⬅ Kembali ke Daftar
+        </a>
 
-        button {
-            width: 100%;
-            background: #f39c12;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        button:hover {
-            background: #d68910;
-        }
-
-        .back {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            text-decoration: none;
-            color: #7f8c8d;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-
-<div class="card">
-
-    <h2>✏ Edit Laporan</h2>
-
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Update Laporan</button>
-    </form>
-
-    <a href="{% url 'report_list' %}" class="back">⬅ Kembali ke Daftar</a>
-
+    </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

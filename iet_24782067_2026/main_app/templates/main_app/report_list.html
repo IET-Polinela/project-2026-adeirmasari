@@ -1,173 +1,77 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Daftar Laporan</title>
+{% extends 'base.html' %}
 
-    <style>
-        body {
-            margin: 0;
-            padding: 20px; /* DIPERKECIL */
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-        }
+{% block title %}Daftar Laporan{% endblock %}
 
-        h2 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
+{% block content %}
+<h2 class="text-center mb-3">📋 Daftar Laporan</h2>
 
-        .add-btn {
-            display: inline-block;
-            margin-bottom: 10px; /* DIPERKECIL */
-            padding: 8px 16px;
-            background: #27ae60;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .add-btn:hover {
-            background: #1e8c4a;
-        }
-
-        hr {
-            margin: 10px 0; /* DIPERKECIL */
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px; /* DIPERKECIL */
-            margin-bottom: 12px; /* DIPERKECIL */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-
-        .card h3 a {
-            text-decoration: none;
-            color: #2980b9;
-        }
-
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .reported { background: #7f8c8d; }
-        .verified { background: #3498db; }
-        .progress { background: #f39c12; }
-        .resolved { background: #2ecc71; }
-
-        button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            color: white;
-            font-weight: bold;
-            margin-top: 6px;
-            font-size: 13px;
-        }
-
-        .btn-verify { background: #3498db; }
-        .btn-process { background: #f39c12; }
-        .btn-done { background: #2ecc71; }
-
-        .actions {
-            margin-top: 8px;
-        }
-
-        .actions a {
-            margin-right: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .update { color: #f39c12; }
-        .delete { color: #e74c3c; }
-        .detail { color: #2980b9; }
-
-        .empty {
-            text-align: center;
-            font-style: italic;
-        }
-    </style>
-</head>
-
-<body>
-
-<h2>📋 Daftar Laporan</h2>
-<a href="{% url 'add_report' %}" class="add-btn">➕ Tambah Laporan</a>
-<hr>
+<a href="{% url 'add_report' %}" class="btn btn-success mb-3">
+    ➕ Tambah Laporan
+</a>
 
 {% for report in reports %}
-<div class="card">
-    <h3>
-        <a href="{% url 'report_detail' report.id %}">
-            {{ report.title }}
-        </a>
-    </h3>
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
 
-    <p><b>Category:</b> {{ report.category }}</p>
-    <p><b>Description:</b> {{ report.description }}</p>
-    <p><b>Location:</b> {{ report.location }}</p>
+        <h5>
+            <a href="{% url 'report_detail' report.id %}">
+                {{ report.title }}
+            </a>
+        </h5>
 
-    <p>
-        <b>Status:</b>
+        <p><b>Category:</b> {{ report.category }}</p>
+        <p><b>Description:</b> {{ report.description }}</p>
+        <p><b>Location:</b> {{ report.location }}</p>
+
+        <p>
+            <b>Status:</b>
+            {% if report.status == 'REPORTED' %}
+                <span class="badge bg-secondary">Reported</span>
+            {% elif report.status == 'VERIFIED' %}
+                <span class="badge bg-primary">Verified</span>
+            {% elif report.status == 'IN_PROGRESS' %}
+                <span class="badge bg-warning">In Progress</span>
+            {% else %}
+                <span class="badge bg-success">Resolved</span>
+            {% endif %}
+        </p>
+
+        <p>
+            <b>Created at:</b>
+            {{ report.created_at|date:"d M Y H:i" }}
+        </p>
+
+        <!-- WORKFLOW -->
         {% if report.status == 'REPORTED' %}
-            <span class="badge reported">Reported</span>
+            <form method="POST" action="{% url 'update_status' report.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="VERIFIED">
+                <button class="btn btn-primary btn-sm">Verifikasi</button>
+            </form>
         {% elif report.status == 'VERIFIED' %}
-            <span class="badge verified">Verified</span>
+            <form method="POST" action="{% url 'update_status' report.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="IN_PROGRESS">
+                <button class="btn btn-warning btn-sm">Proses</button>
+            </form>
         {% elif report.status == 'IN_PROGRESS' %}
-            <span class="badge progress">In Progress</span>
-        {% else %}
-            <span class="badge resolved">Resolved</span>
+            <form method="POST" action="{% url 'update_status' report.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="RESOLVED">
+                <button class="btn btn-success btn-sm">Selesai</button>
+            </form>
         {% endif %}
-    </p>
 
-    <p><b>Created at:</b> {{ report.created_at|date:"d M Y H:i" }}</p>
+        <div class="mt-3">
+            <a href="{% url 'update_report' report.id %}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="{% url 'delete_report' report.id %}" class="btn btn-danger btn-sm">Hapus</a>
+            <a href="{% url 'report_detail' report.id %}" class="btn btn-info btn-sm">Detail</a>
+        </div>
 
-    {% if report.status == 'REPORTED' %}
-        <form method="POST" action="{% url 'update_status' report.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="status" value="VERIFIED">
-            <button class="btn-verify">Verification</button>
-        </form>
-    {% elif report.status == 'VERIFIED' %}
-        <form method="POST" action="{% url 'update_status' report.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="status" value="IN_PROGRESS">
-            <button class="btn-process">Process</button>
-        </form>
-    {% elif report.status == 'IN_PROGRESS' %}
-        <form method="POST" action="{% url 'update_status' report.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="status" value="RESOLVED">
-            <button class="btn-done">Finish</button>
-        </form>
-    {% endif %}
-
-    <div class="actions">
-        <a href="{% url 'update_report' report.id %}" class="update">Update</a>
-        <a href="{% url 'delete_report' report.id %}" class="delete">Delete</a>
-        <a href="{% url 'report_detail' report.id %}" class="detail">Detail</a>
     </div>
 </div>
-{% empty %}
-<p class="empty">Belum ada laporan</p>
-{% endfor %}
 
-</body>
-</html>
+{% empty %}
+<p class="text-center fst-italic">Belum ada laporan</p>
+{% endfor %}
+{% endblock %}
