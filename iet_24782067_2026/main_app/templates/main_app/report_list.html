@@ -26,31 +26,81 @@
             {% for report in reports %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td class="text-start">{{ report.title }}</td>
+
+                <td class="text-start">
+                    {{ report.title }}
+                </td>
+
                 <td>{{ report.location }}</td>
+
+                <!-- STATUS BADGE -->
                 <td>
                     {% if report.status == 'REPORTED' %}
                         <span class="badge bg-secondary">Reported</span>
                     {% elif report.status == 'VERIFIED' %}
                         <span class="badge bg-primary">Verified</span>
                     {% elif report.status == 'IN_PROGRESS' %}
-                        <span class="badge bg-warning">In Progress</span>
+                        <span class="badge bg-warning text-dark">In Progress</span>
                     {% else %}
                         <span class="badge bg-success">Resolved</span>
                     {% endif %}
                 </td>
+
+                <!-- AKSI + WORKFLOW -->
                 <td>
-                    <a href="{% url 'report_detail' report.id %}" class="btn btn-info btn-sm">
+                    <!-- DETAIL -->
+                    <a href="{% url 'report_detail' report.id %}"
+                       class="btn btn-info btn-sm mb-1">
                         Detail
                     </a>
-                    <a href="{% url 'update_report' report.id %}" class="btn btn-warning btn-sm">
+
+                    <!-- WORKFLOW (HIDE METHOD) -->
+                    {% if report.status == 'REPORTED' %}
+                        <form method="POST"
+                              action="{% url 'update_status' report.id %}"
+                              class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="VERIFIED">
+                            <button class="btn btn-primary btn-sm mb-1">
+                                Verifikasi
+                            </button>
+                        </form>
+
+                    {% elif report.status == 'VERIFIED' %}
+                        <form method="POST"
+                              action="{% url 'update_status' report.id %}"
+                              class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="IN_PROGRESS">
+                            <button class="btn btn-warning btn-sm mb-1">
+                                Proses
+                            </button>
+                        </form>
+
+                    {% elif report.status == 'IN_PROGRESS' %}
+                        <form method="POST"
+                              action="{% url 'update_status' report.id %}"
+                              class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="RESOLVED">
+                            <button class="btn btn-success btn-sm mb-1">
+                                Selesai
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <!-- EDIT & DELETE -->
+                    <a href="{% url 'update_report' report.id %}"
+                       class="btn btn-warning btn-sm mb-1">
                         Edit
                     </a>
-                    <a href="{% url 'delete_report' report.id %}" class="btn btn-danger btn-sm">
+                    <a href="{% url 'delete_report' report.id %}"
+                       class="btn btn-danger btn-sm mb-1">
                         Hapus
                     </a>
                 </td>
             </tr>
+
             {% empty %}
             <tr>
                 <td colspan="5" class="fst-italic text-center">

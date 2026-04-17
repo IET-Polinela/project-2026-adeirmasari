@@ -8,11 +8,11 @@
 
         <h2 class="text-center mb-4">✏ Edit Laporan</h2>
 
-        <form method="POST">
+        <form method="POST" onsubmit="loadingUpdate(this)">
             {% csrf_token %}
             {{ form.as_p }}
 
-            <button class="btn btn-warning w-100">
+            <button id="updateBtn" class="btn btn-warning w-100">
                 Update Laporan
             </button>
         </form>
@@ -23,4 +23,12 @@
 
     </div>
 </div>
+
+<script>
+function loadingUpdate(form) {
+    const btn = document.getElementById("updateBtn");
+    btn.disabled = true;
+    btn.innerText = "Loading...";
+}
+</script>
 {% endblock %}
