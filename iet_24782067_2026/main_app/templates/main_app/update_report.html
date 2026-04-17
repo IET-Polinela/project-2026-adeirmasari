@@ -8,12 +8,13 @@
 
         <h2 class="text-center mb-4">✏ Edit Laporan</h2>
 
-        <form method="POST" onsubmit="loadingUpdate(this)">
+        <form method="POST" onsubmit="showLoading(this)">
             {% csrf_token %}
             {{ form.as_p }}
 
             <button id="updateBtn" class="btn btn-warning w-100">
-                Update Laporan
+                <span>Update Laporan</span>
+                <span class="spinner-border spinner-border-sm ms-2 d-none"></span>
             </button>
         </form>
 
@@ -25,10 +26,12 @@
 </div>
 
 <script>
-function loadingUpdate(form) {
-    const btn = document.getElementById("updateBtn");
+function showLoading(form) {
+    const btn = form.querySelector("button");
+    const spinner = form.querySelector(".spinner-border");
+
     btn.disabled = true;
-    btn.innerText = "Loading...";
+    spinner.classList.remove("d-none");
 }
 </script>
 {% endblock %}

@@ -8,12 +8,13 @@
 
         <h2 class="text-center mb-4">➕ Tambah Laporan</h2>
 
-        <form method="POST" onsubmit="loadingSubmit(this)">
+        <form method="POST" onsubmit="showLoading(this)">
             {% csrf_token %}
             {{ form.as_p }}
 
             <button id="submitBtn" class="btn btn-success w-100">
-                Simpan Laporan
+                <span id="btnText">Simpan Laporan</span>
+                <span id="spinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
             </button>
         </form>
 
@@ -25,10 +26,12 @@
 </div>
 
 <script>
-function loadingSubmit(form) {
+function showLoading(form) {
     const btn = document.getElementById("submitBtn");
+    const spinner = document.getElementById("spinner");
+
     btn.disabled = true;
-    btn.innerText = "Loading...";
+    spinner.classList.remove("d-none");
 }
 </script>
 {% endblock %}
