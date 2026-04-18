@@ -1,18 +1,6 @@
 {% extends 'base.html' %}
 
 {% block title %}Daftar Laporan{% endblock %}
-{% block breadcrumb %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="/">Home</a>
-        </li>
-        <li class="breadcrumb-item active">
-            Reports
-        </li>
-    </ol>
-</nav>
-{% endblock %}
 
 {% block content %}
 <h2 class="text-center mb-4">📋 Daftar Laporan</h2>
@@ -69,8 +57,8 @@
                     <!-- WORKFLOW (HIDE METHOD) -->
                     {% if report.status == 'REPORTED' %}
                         <form method="POST"
-                              action="{% url 'update_status' report.id %}"
-                              onsubmit="return confirm('Yakin ingin mengubah status laporan ini?')">
+                            action="{% url 'update_status' report.id %}"
+                            onsubmit="return confirm('Yakin ingin mengubah status laporan ini?')">
                             {% csrf_token %}
                             <input type="hidden" name="status" value="VERIFIED">
                             <button class="btn btn-primary btn-sm mb-1">
@@ -115,8 +103,8 @@
 
             {% empty %}
             <tr>
-                <td colspan="5" class="fst-italic text-center">
-                    Belum ada laporan
+                <td colspan="5" class="text-center py-4">
+                    <p class="fst-italic mb-3">Belum ada laporan</p>
                 </td>
             </tr>
             {% endfor %}
