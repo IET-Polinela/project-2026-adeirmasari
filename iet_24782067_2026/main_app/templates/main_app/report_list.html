@@ -58,7 +58,7 @@
                     {% if report.status == 'REPORTED' %}
                         <form method="POST"
                               action="{% url 'update_status' report.id %}"
-                              class="d-inline">
+                              onsubmit="return confirm('Yakin ingin mengubah status laporan ini?')">
                             {% csrf_token %}
                             <input type="hidden" name="status" value="VERIFIED">
                             <button class="btn btn-primary btn-sm mb-1">
