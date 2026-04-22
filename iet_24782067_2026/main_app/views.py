@@ -49,16 +49,16 @@ class ReportUpdateView(UpdateView):
         return super().form_valid(form)
 
 
+
 # DELETE
 class ReportDeleteView(DeleteView):
     model = Report
     template_name = 'main_app/delete.html'
     success_url = reverse_lazy('report_list')
 
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Laporan berhasil dihapus.")
-        return super().delete(request, *args, **kwargs)
-
+    def post(self, request, *args, **kwargs):
+        messages.success(request, "Laporan berhasil dihapus.")
+        return super().post(request, *args, **kwargs)
 
 # WORKFLOW STATUS
 class ReportUpdateStatusView(View):
@@ -66,9 +66,10 @@ class ReportUpdateStatusView(View):
         report = get_object_or_404(Report, pk=pk)
         new_status = request.POST.get('status')
 
+        # Workflow validation
         if report.status == 'REPORTED' and new_status == 'VERIFIED':
             report.status = 'VERIFIED'
-            messages.success(request, "Laporan berhasil diverifikasi.")
+            messages.success(request, "Status laporan berhasil diverifikasi.")
 
         elif report.status == 'VERIFIED' and new_status == 'IN_PROGRESS':
             report.status = 'IN_PROGRESS'
@@ -77,6 +78,9 @@ class ReportUpdateStatusView(View):
         elif report.status == 'IN_PROGRESS' and new_status == 'RESOLVED':
             report.status = 'RESOLVED'
             messages.success(request, "Laporan telah diselesaikan.")
+
+        else:
+            messages.error(request, "Perubahan status tidak valid.")
 
         report.save()
         return redirect('report_list')
