@@ -50,7 +50,7 @@
                         </span>
                     </li>
 
-                    <!-- ✅ LOGOUT HARUS POST -->
+                    <!-- LOGOUT (POST) -->
                     <li class="nav-item">
                         <form method="post" action="{% url 'logout' %}" class="d-inline">
                             {% csrf_token %}
@@ -60,9 +60,17 @@
                         </form>
                     </li>
                 {% else %}
+                    <!-- LOGIN -->
                     <li class="nav-item">
                         <a class="nav-link text-light" href="{% url 'login' %}">
                             Login
+                        </a>
+                    </li>
+
+                    <!-- REGISTER (CITIZEN) -->
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="{% url 'register' %}">
+                            Register
                         </a>
                     </li>
                 {% endif %}
