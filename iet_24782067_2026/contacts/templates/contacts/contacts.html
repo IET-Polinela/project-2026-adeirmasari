@@ -1,5 +1,135 @@
-<h1>Halaman Kontak</h1>
-<p>Kontak kami</p>
-<p>WhatsApp  : 081234567808</p>
-<p>Instagram : lampurasikep_</p>
-<p>Tiktok    : Lampurasikep01</p>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hubungi Kami{% endblock %}
+
+{% block content %}
+<style>
+    /* Kartu transparan dengan efek kaca */
+    .contact-glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 50px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        max-width: 850px;
+        margin: 40px auto;
+    }
+
+    .contact-header {
+        border-bottom: 2px solid #27ae60;
+        display: inline-block;
+        margin-bottom: 30px;
+        padding-bottom: 5px;
+        color: #1a3c34;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    /* Item kontak dengan hover effect */
+    .contact-item {
+        background: #f8fdfa;
+        border: 1px solid #e1eee7;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .contact-item:hover {
+        transform: translateX(10px);
+        border-color: #27ae60;
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.1);
+    }
+
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #27ae60, #1e8449);
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 20px;
+    }
+
+    .contact-info h6 {
+        margin: 0;
+        color: #1a3c34;
+        font-weight: 700;
+    }
+
+    .contact-info p {
+        margin: 0;
+        color: #666;
+    }
+
+    .work-hour-badge {
+        background: #e9f7ef;
+        color: #1e8449;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="contact-glass-card text-center">
+    <h2 class="contact-header">📬 Hubungi Kami</h2>
+    
+    <p class="mb-5 text-muted">
+        Kami menghargai setiap suara Anda. Jika Anda mengalami kendala teknis atau memiliki pertanyaan terkait aplikasi <strong>LAMPURA SIKEP</strong>, tim kami siap membantu Anda.
+    </p>
+
+    <div class="row text-start">
+        <div class="col-12">
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="bi bi-envelope-paper"></i>
+                </div>
+                <div class="contact-info">
+                    <h6>Email Resmi</h6>
+                    <p>adeiramsari255@gmail.com</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="bi bi-whatsapp"></i>
+                </div>
+                <div class="contact-info">
+                    <h6>Layanan WhatsApp / Telepon</h6>
+                    <p>0851-2955-0304</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="contact-item">
+                <div class="contact-icon">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+                <div class="contact-info">
+                    <h6>Lokasi Operasional</h6>
+                    <p>Lampung Utara, Provinsi Lampung</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="work-hour-badge">
+        <i class="bi bi-clock-history me-2"></i>
+        <span>Respons pada Jam Kerja: Senin - Jumat (08.00 - 16.00 WIB)</span>
+    </div>
+</div>
+{% endblock %}

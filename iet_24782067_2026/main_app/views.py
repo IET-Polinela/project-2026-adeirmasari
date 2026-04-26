@@ -5,82 +5,112 @@ from django.urls import reverse_lazy
 from .models import Report
 from .forms import ReportForm
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-
-# HOME 
+# --- HOME ---
+# Menangani path('', home, name='home')
 def home(request):
     return render(request, 'main_app/home.html')
 
-
-# READ (LIST)
-class ReportListView(ListView):
+# --- READ (LIST) ---
+# Menangani path('reports/', ReportListView.as_view(), name='report_list')
+class ReportListView(LoginRequiredMixin, ListView):
     model = Report
     template_name = 'main_app/report_list.html'
     context_object_name = 'reports'
+    ordering = ['-id']  # Menampilkan laporan terbaru di atas
 
-
-# DETAIL 
-class ReportDetailView(DetailView):
+# --- DETAIL ---
+# Menangani path('report/<int:pk>/', ReportDetailView.as_view(), name='report_detail')
+class ReportDetailView(LoginRequiredMixin, DetailView):
     model = Report
     template_name = 'main_app/report_detail.html'
+    context_object_name = 'report'
 
-
-# CREATE
-class ReportCreateView(CreateView):
+# --- CREATE ---
+# Menangani path('add/', ReportCreateView.as_view(), name='add_report')
+class ReportCreateView(LoginRequiredMixin, CreateView):
     model = Report
     form_class = ReportForm
     template_name = 'main_app/add_report.html'
     success_url = reverse_lazy('report_list')
 
+    def dispatch(self, request, *args, **kwargs):
+        # Proteksi Admin
+        if not getattr(request.user, 'is_admin', False):
+            messages.error(request, "Akses ditolak! Hanya Admin yang boleh menambah laporan.")
+            return redirect('report_list')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        messages.success(self.request, "Laporan berhasil ditambahkan.")
+        messages.success(self.request, "Laporan baru berhasil ditambahkan!")
         return super().form_valid(form)
 
-
-# UPDATE
-class ReportUpdateView(UpdateView):
+# --- UPDATE ---
+# Menangani path('update/<int:pk>/', ReportUpdateView.as_view(), name='update_report')
+class ReportUpdateView(LoginRequiredMixin, UpdateView):
     model = Report
     form_class = ReportForm
     template_name = 'main_app/update_report.html'
     success_url = reverse_lazy('report_list')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not getattr(request.user, 'is_admin', False):
+            messages.error(request, "Akses ditolak! Hanya Admin yang boleh mengubah laporan.")
+            return redirect('report_list')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         messages.success(self.request, "Laporan berhasil diperbarui.")
         return super().form_valid(form)
 
-
-
-# DELETE
-class ReportDeleteView(DeleteView):
+# --- DELETE ---
+# Menangani path('delete/<int:pk>/', ReportDeleteView.as_view(), name='delete_report')
+class ReportDeleteView(LoginRequiredMixin, DeleteView):
     model = Report
     template_name = 'main_app/delete.html'
     success_url = reverse_lazy('report_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not getattr(request.user, 'is_admin', False):
+            messages.error(request, "Akses ditolak! Hanya Admin yang boleh menghapus laporan.")
+            return redirect('report_list')
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         messages.success(request, "Laporan berhasil dihapus.")
         return super().post(request, *args, **kwargs)
 
-# WORKFLOW STATUS
-class ReportUpdateStatusView(View):
+# --- WORKFLOW STATUS UPDATE ---
+# Menangani path('update-status/<int:pk>/', ReportUpdateStatusView.as_view(), name='update_status')
+class ReportUpdateStatusView(LoginRequiredMixin, View):
     def post(self, request, pk):
+        if not getattr(request.user, 'is_admin', False):
+            messages.error(request, "Akses ditolak! Hanya Admin yang bisa merubah status.")
+            return redirect('report_list')
+
         report = get_object_or_404(Report, pk=pk)
         new_status = request.POST.get('status')
 
-        # Workflow validation
+        # Validasi Alur Status
+        valid_transition = False
+        
         if report.status == 'REPORTED' and new_status == 'VERIFIED':
             report.status = 'VERIFIED'
-            messages.success(request, "Status laporan berhasil diverifikasi.")
-
+            messages.success(request, "Laporan berhasil diverifikasi.")
+            valid_transition = True
         elif report.status == 'VERIFIED' and new_status == 'IN_PROGRESS':
             report.status = 'IN_PROGRESS'
-            messages.success(request, "Laporan sedang diproses.")
-
+            messages.success(request, "Laporan sekarang dalam proses pengerjaan.")
+            valid_transition = True
         elif report.status == 'IN_PROGRESS' and new_status == 'RESOLVED':
             report.status = 'RESOLVED'
-            messages.success(request, "Laporan telah diselesaikan.")
-
+            messages.success(request, "Laporan telah ditandai sebagai selesai.")
+            valid_transition = True
+        
+        if not valid_transition:
+            messages.error(request, "Perubahan status tidak valid atau tidak sesuai urutan.")
         else:
-            messages.error(request, "Perubahan status tidak valid.")
+            report.save()
 
-        report.save()
         return redirect('report_list')

@@ -1,47 +1,55 @@
 {% extends 'base.html' %}
-
-{% block title %}Home{% endblock %}
-
 {% block content %}
 <style>
-    .home-box {
-        background: white;
-        padding: 40px;
-        max-width: 700px;
-        margin: 80px auto;
+    .home-card {
+        background: rgba(255, 255, 255, 0.95); 
+        padding: 80px 40px;
+        border-radius: 40px; /* Lebih melengkung agar cantik */
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4);
         text-align: center;
-        border-radius: 12px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        max-width: 800px;
+        margin: 80px auto; 
+        border-top: 8px solid #27ae60;
+    }
+    
+    .home-card h1 {
+        color: #1a3c34;
+        font-weight: 800;
+        font-size: 3rem;
+        margin-bottom: 10px;
     }
 
-    .home-box h1 {
-        color: #2c3e50;
-        margin-bottom: 15px;
+    .home-card .sub-title {
+        font-size: 1.5rem;
+        color: #666;
+        margin-bottom: 40px;
     }
 
-    .home-box a {
+    /* Tombol dengan gaya Gradasi Elegan */
+    .btn-main {
         display: inline-block;
-        margin-top: 25px;
-        padding: 12px 24px;
-        background-color: #3498db;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
+        padding: 18px 60px;
+        background: linear-gradient(45deg, #1e8449, #2ecc71);
+        color: white !important;
+        border-radius: 50px;
         font-weight: bold;
-        transition: 0.3s;
+        text-decoration: none;
+        transition: 0.4s;
+        box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
     }
 
-    .home-box a:hover {
-        background-color: #2c80b4;
+    .btn-main:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(39, 174, 96, 0.5);
     }
 </style>
 
-<div class="home-box">
-    <h1>Selamat Datang di Kota Lampung Utara</h1>
-    <h1>Kami Siap Melayani Anda</h1>
+<div class="home-card">
+    <h1>Selamat Datang di <br><span style="color: #27ae60;">Lampung Utara</span></h1>
+    <p class="sub-title">Kami Siap Melayani Anda Sepenuh Hati</p>
 
-    <a href="{% url 'report_list' %}">
-        Lihat Data Laporan
+    <a href="/reports/" class="btn-main">
+        <i class="bi bi-file-earmark-text me-2"></i> Jelajahi Laporan
     </a>
 </div>
 {% endblock %}

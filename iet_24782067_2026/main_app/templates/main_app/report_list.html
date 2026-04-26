@@ -1,114 +1,216 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Daftar Laporan{% endblock %}
 
 {% block content %}
-<h2 class="text-center mb-4">📋 Daftar Laporan</h2>
+<style>
+    /* Wadah utama dengan efek kaca transparan */
+    .report-glass-card {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 25px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        margin-bottom: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
 
-<div class="d-flex justify-content-end mb-3">
-    <a href="{% url 'add_report' %}" class="btn btn-success">
-        ➕ Tambah Laporan
-    </a>
+    /* Judul dengan nuansa hijau tenang */
+    .report-header-title { 
+        color: #1a3c34; 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+    }
+
+    /* Styling Tabel Modern */
+    .table-modern { 
+        border-collapse: separate; 
+        border-spacing: 0 8px; 
+    }
+
+    .table-modern thead th { 
+        background-color: #27ae60 !important; 
+        color: white !important; 
+        border: none; 
+        padding: 15px; 
+        font-weight: 600; 
+    }
+
+    .table-modern tbody tr { 
+        background-color: white; 
+        transition: all 0.3s ease; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+    }
+
+    .table-modern tbody tr:hover { 
+        transform: translateY(-3px); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+        background-color: #f0fff4; 
+    }
+
+    .table-modern td { 
+        padding: 15px !important; 
+        border: none !important; 
+        vertical-align: middle; 
+    }
+
+    /* Tombol Tambah Laporan Kustom */
+    .btn-green-main { 
+        background: linear-gradient(45deg, #1e8449, #2ecc71); 
+        color: white !important; 
+        border: none; 
+        border-radius: 50px; 
+        padding: 12px 30px; 
+        font-weight: bold; 
+        transition: 0.3s; 
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); 
+        text-decoration: none; 
+    }
+
+    .btn-green-main:hover { 
+        transform: scale(1.05); 
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4); 
+    }
+
+    .badge { 
+        padding: 8px 12px; 
+        border-radius: 50px; 
+        font-size: 0.75rem; 
+    }
+</style>
+
+<div class="report-glass-card">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="report-header-title m-0">📋 Daftar Laporan</h2>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'add_report' %}" class="btn-green-main">
+                <i class="bi bi-plus-circle me-2"></i> Tambah Laporan
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-modern align-middle text-center">
+            <thead>
+                <tr>
+                    <th style="border-radius: 15px 0 0 15px;">No</th>
+                    <th>Judul</th>
+                    <th>Lokasi</th>
+                    <th>Status</th>
+                    <th style="border-radius: 0 15px 15px 0;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ report.title }}</strong></td>
+                    <td>{{ report.location }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if report.status == 'REPORTED' %}bg-secondary
+                            {% elif report.status == 'VERIFIED' %}bg-primary
+                            {% elif report.status == 'IN_PROGRESS' %}bg-warning text-dark
+                            {% elif report.status == 'RESOLVED' %}bg-success
+                            {% endif %}">
+                            {{ report.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                            <a href="{% url 'report_detail' report.id %}" class="btn btn-info btn-sm text-white rounded-pill px-3 shadow-sm">
+                                DETAIL
+                            </a>
+
+                            {% if report.status == 'REPORTED' %}
+                                <form method="POST" action="{% url 'update_status' report.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="VERIFIED">
+                                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 btn-confirm shadow-sm" 
+                                            data-title="Verifikasi Laporan?" 
+                                            data-text="Apakah laporan ini sudah valid untuk diproses?"
+                                            data-icon="question">
+                                        VERIFIKASI
+                                    </button>
+                                </form>
+                            {% elif report.status == 'VERIFIED' %}
+                                <form method="POST" action="{% url 'update_status' report.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="IN_PROGRESS">
+                                    <button type="button" class="btn btn-warning btn-sm text-dark rounded-pill px-3 btn-confirm shadow-sm"
+                                            data-title="Proses Laporan?" 
+                                            data-text="Pindahkan status ke dalam pengerjaan?"
+                                            data-icon="info">
+                                        PROSES
+                                    </button>
+                                </form>
+                            {% elif report.status == 'IN_PROGRESS' %}
+                                <form method="POST" action="{% url 'update_status' report.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="RESOLVED">
+                                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3 btn-confirm shadow-sm"
+                                            data-title="Selesaikan Laporan?" 
+                                            data-text="Pastikan semua masalah dalam laporan ini sudah tuntas."
+                                            data-icon="success">
+                                        SELESAI
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <a href="{% url 'update_report' report.id %}" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm">
+                                EDIT
+                            </a>
+                            
+                            <form action="{% url 'delete_report' report.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 btn-confirm shadow-sm"
+                                        data-title="Hapus Laporan?" 
+                                        data-text="Laporan akan hilang permanen dari database!" 
+                                        data-icon="warning">
+                                    HAPUS
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted italic">Belum ada laporan masuk.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-striped table-hover align-middle text-center">
-        <thead class="table-primary">
-            <tr>
-                <th>No</th>
-                <th>Judul</th>
-                <th>Lokasi</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for report in reports %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
+<script>
+    document.querySelectorAll('.btn-confirm').forEach(button => {
+        button.addEventListener('click', function(e) {
+            const title = this.getAttribute('data-title');
+            const text = this.getAttribute('data-text');
+            const icon = this.getAttribute('data-icon') || 'question';
+            const form = this.closest('form');
 
-                <td class="text-start">
-                    {{ report.title }}
-                </td>
-
-                <td>{{ report.location }}</td>
-
-                <!-- STATUS BADGE -->
-                <td>
-                    {% if report.status == 'REPORTED' %}
-                        <span class="badge bg-secondary">Reported</span>
-                    {% elif report.status == 'VERIFIED' %}
-                        <span class="badge bg-primary">Verified</span>
-                    {% elif report.status == 'IN_PROGRESS' %}
-                        <span class="badge bg-warning text-dark">In Progress</span>
-                    {% else %}
-                        <span class="badge bg-success">Resolved</span>
-                    {% endif %}
-                </td>
-
-                <!-- AKSI + WORKFLOW -->
-                <td>
-                    <!-- DETAIL -->
-                    <a href="{% url 'report_detail' report.id %}"
-                       class="btn btn-info btn-sm mb-1">
-                        Detail
-                    </a>
-
-                    <!-- WORKFLOW (HIDE METHOD) -->
-                    {% if report.status == 'REPORTED' %}
-                        <form method="POST"
-                            action="{% url 'update_status' report.id %}"
-                            onsubmit="return confirm('Yakin ingin mengubah status laporan ini?')">
-                            {% csrf_token %}
-                            <input type="hidden" name="status" value="VERIFIED">
-                            <button class="btn btn-primary btn-sm mb-1">
-                                Verifikasi
-                            </button>
-                        </form>
-
-                    {% elif report.status == 'VERIFIED' %}
-                        <form method="POST"
-                              action="{% url 'update_status' report.id %}"
-                              class="d-inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="status" value="IN_PROGRESS">
-                            <button class="btn btn-warning btn-sm mb-1">
-                                Proses
-                            </button>
-                        </form>
-
-                    {% elif report.status == 'IN_PROGRESS' %}
-                        <form method="POST"
-                              action="{% url 'update_status' report.id %}"
-                              class="d-inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="status" value="RESOLVED">
-                            <button class="btn btn-success btn-sm mb-1">
-                                Selesai
-                            </button>
-                        </form>
-                    {% endif %}
-
-                    <!-- EDIT & DELETE -->
-                    <a href="{% url 'update_report' report.id %}"
-                       class="btn btn-warning btn-sm mb-1">
-                        Edit
-                    </a>
-                    <a href="{% url 'delete_report' report.id %}"
-                       class="btn btn-danger btn-sm mb-1">
-                        Hapus
-                    </a>
-                </td>
-            </tr>
-
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center py-4">
-                    <p class="fst-italic mb-3">Belum ada laporan</p>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonColor: '#27ae60',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Lanjutkan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -4,7 +4,8 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}IET City{% endblock %}</title>
+<title>{% block title %}LAMMPURA SIKEP{% endblock %}</title>
+{% load static %}
 
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,13 +13,62 @@
 <!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-image: url("{% static 'Tugu_Lampura.jpg' %}"); 
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        position: relative;
+    }
+
+    /* Lapisan overlay hijau botol yang elegan agar foto tidak terlalu mencolok */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(15, 35, 25, 0.85), rgba(5, 15, 10, 0.9));
+        z-index: -1;
+    }
+
+    /* Navbar transparan dengan efek blur kaca modern */
+    .navbar-custom {
+        background: rgba(25, 60, 45, 0.7) !important;
+        backdrop-filter: blur(15px); /* Efek blur kaca */
+        -webkit-backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px 0;
+    }
+
+    .navbar-brand {
+        font-weight: 800 !important;
+        color: #2ecc71 !important;
+        text-transform: uppercase;
+    }
+
+    /* Styling Breadcrumb agar lebih modern */
+    .breadcrumb-container {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(5px);
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+    }
+    .breadcrumb-item a { color: #58d68d !important; text-decoration: none; }
+    .breadcrumb-item.active { color: rgba(255,255,255,0.6) !important; }
+</style>
+
 </head>
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="/">IET City</a>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+        <a class="navbar-brand" href="/">LAMPURA SIKEP</a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -54,7 +104,7 @@
                     <li class="nav-item">
                         <form method="post" action="{% url 'logout' %}" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-warning btn-sm ms-2">
+                            <button type="submit" class="btn btn-outline-light btn-sm ms-2">                                
                                 Logout
                             </button>
                         </form>
@@ -81,12 +131,12 @@
 </nav>
 
 <!-- ALERT MESSAGES -->
-<div class="container mt-3">
+<div class="container mt-3" style="position: relative; z-index: 1000;">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow" role="alert">
+                <strong>Informasi:</strong> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         {% endfor %}
     {% endif %}
@@ -112,7 +162,6 @@
 </div>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

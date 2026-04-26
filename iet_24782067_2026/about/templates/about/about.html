@@ -1,3 +1,118 @@
-<h1>Halaman About</h1>
-<p>Website ini dapat tempat anda untuk melaporkan 
-    kejadian apapun di kabupaten lampung utara.</p>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tentang Kami{% endblock %}
+
+{% block content %}
+<style>
+    /* Efek kartu kaca yang modern dan elegan */
+    .about-glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 50px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        margin-bottom: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Judul dengan aksen hijau tenang */
+    .about-title {
+        color: #1a3c34;
+        font-weight: 850;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        display: inline-block;
+        margin-bottom: 30px;
+    }
+
+    .about-title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 60px;
+        height: 5px;
+        background: #27ae60;
+        border-radius: 10px;
+    }
+
+    /* Gaya paragraf agar lebih nyaman dibaca */
+    .about-text {
+        font-size: 1.1rem;
+        color: #444;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    /* Daftar fitur dengan ikon hijau */
+    .feature-list {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 30px;
+    }
+
+    .feature-list li {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .feature-list i {
+        background: #27ae60;
+        color: white;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 15px;
+        font-size: 0.9rem;
+    }
+
+    .dev-badge {
+        background: #f0fff4;
+        border-left: 5px solid #27ae60;
+        padding: 20px;
+        border-radius: 0 15px 15px 0;
+        margin-top: 40px;
+    }
+</style>
+
+<div class="about-glass-card">
+    <h2 class="about-title">🌿 Tentang LAMPURA SIKEP</h2>
+    
+    <div class="about-text">
+        <p>
+            <strong>LAMPURA SIKEP</strong> (Sistem Informasi Keamanan dan Pelayanan) adalah platform digital inovatif yang dirancang khusus untuk memfasilitasi aspirasi dan laporan masyarakat di wilayah <strong>Lampung Utara</strong>. Aplikasi ini lahir dari semangat modernisasi pelayanan publik melalui teknologi informasi.
+        </p>
+        
+        <p>
+            Dibangun menggunakan framework <strong>Django</strong>, sistem ini mengintegrasikan efisiensi manajemen data dengan antarmuka yang ramah pengguna. Kehadiran aplikasi ini bertujuan untuk memperpendek jarak antara masyarakat dan pemberi layanan, memastikan setiap laporan terdokumentasi dengan transparan, cepat, dan akurat.
+        </p>
+    </div>
+
+    <h4 class="mt-5 mb-3 fw-bold" style="color: #1a3c34;">Keunggulan Sistem :</h4>
+    <ul class="feature-list">
+        <li><i class="bi bi-shield-check"></i> Autentikasi Keamanan Pengguna Berlapis.</li>
+        <li><i class="bi bi-lightning-charge"></i> Pelaporan Real-Time yang Efisien.</li>
+        <li><i class="bi bi-eye"></i> Transparansi Status Laporan (Verified, In Progress, Resolved).</li>
+        <li><i class="bi bi-phone"></i> Desain Responsif yang Nyaman Diakses di Semua Perangkat.</li>
+    </ul>
+
+    <div class="dev-badge">
+        <h5 class="mb-2 fw-bold" style="color: #1a3c34;">Catatan Pengembangan</h5>
+        <p class="mb-0 text-muted small">
+            Aplikasi ini dikembangkan sebagai bagian dari dedikasi praktikum pemrograman berbasis web, mengutamakan struktur kode yang bersih (clean code) dan fungsionalitas tingkat tinggi untuk kenyamanan warga Lampung Utara.
+        </p>
+    </div>
+</div>
+{% endblock %}

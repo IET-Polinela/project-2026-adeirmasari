@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Registrasi | LAMPURA SIKEP{% endblock %}
+
+{% block content %}
+<style>
+    .reg-card {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 25px;
+        border-left: 8px solid #27ae60;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    /* Style otomatis untuk form django agar cantik */
+    input[type="text"], input[type="password"], input[type="email"], select, textarea {
+        display: block;
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        margin-bottom: 5px;
+    }
+    .helptext { font-size: 0.75rem; color: #6c757d; margin-bottom: 15px; display: block; }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card reg-card border-0 p-4">
+            <h3 class="text-center fw-bold mb-4" style="color: #1a3c34;">Daftar Akun Baru</h3>
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="mb-2">
+                        <label class="form-label fw-bold small">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+                        {% if field.errors %}<div class="text-danger small mb-2">{{ field.errors }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold mt-3 shadow-sm">
+                    Buat Akun <i class="bi bi-person-plus ms-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
