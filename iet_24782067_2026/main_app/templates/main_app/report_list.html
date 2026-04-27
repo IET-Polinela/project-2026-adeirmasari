@@ -42,14 +42,8 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
     }
 
-    .table-modern tbody tr:hover { 
-        transform: translateY(-3px); 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
-        background-color: #f0fff4; 
-    }
-
     .table-modern td { 
-        padding: 15px !important; 
+        padding: 12px 8px !important; /* Diperkecil sedikit agar tidak makan tempat */
         border: none !important; 
         vertical-align: middle; 
     }
@@ -64,6 +58,22 @@
         transition: 0.3s; 
         box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); 
         text-decoration: none; 
+    }
+
+    /* Styling tombol aksi agar tidak numpuk */
+    .action-group {
+        display: flex;
+        justify-content: center;
+        gap: 5px; /* Jarak antar tombol */
+        flex-wrap: nowrap; /* Mencegah tombol turun ke bawah (tetap satu baris) */
+    }
+
+    .btn-action {
+        font-size: 11px !important; /* Ukuran teks diperkecil */
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 6px 12px !important;
+        white-space: nowrap; /* Mencegah teks tombol terpotong jadi 2 baris */
     }
 
     .badge { 
@@ -89,11 +99,11 @@
         <table class="table table-modern align-middle text-center">
             <thead>
                 <tr>
-                    <th style="border-radius: 15px 0 0 15px;">No</th>
+                    <th style="border-radius: 15px 0 0 15px; width: 50px;">No</th>
                     <th>Judul</th>
                     <th>Lokasi</th>
                     <th>Status</th>
-                    <th style="border-radius: 0 15px 15px 0;">Aksi</th>
+                    <th style="border-radius: 0 15px 15px 0; width: 300px;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -113,52 +123,46 @@
                         </span>
                     </td>
                     <td>
-                        <div class="d-flex flex-wrap justify-content-center gap-1">
-                            <a href="{% url 'report_detail' report.id %}" class="btn btn-info btn-sm text-white rounded-pill px-3 shadow-sm">
-                                DETAIL
+                        <div class="action-group">
+                            <a href="{% url 'report_detail' report.id %}" class="btn btn-info btn-action text-white rounded-pill shadow-sm">
+                                DETAILS
                             </a>
 
                             {% if report.status == 'REPORTED' %}
                                 <form method="POST" action="{% url 'update_status' report.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <input type="hidden" name="status" value="VERIFIED">
-                                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 btn-confirm shadow-sm" 
-                                            data-title="Verifikasi Laporan?" 
-                                            data-text="Apakah laporan ini sudah valid?"
-                                            data-icon="question">
-                                        VERIFIKASI
+                                    <button type="button" class="btn btn-primary btn-action rounded-pill btn-confirm shadow-sm" 
+                                            data-title="Verifikasi Laporan?" data-text="Validkan laporan?" data-icon="question">
+                                        VERIFIED
                                     </button>
                                 </form>
                             {% elif report.status == 'VERIFIED' %}
                                 <form method="POST" action="{% url 'update_status' report.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <input type="hidden" name="status" value="IN_PROGRESS">
-                                    <button type="button" class="btn btn-warning btn-sm text-dark rounded-pill px-3 btn-confirm shadow-sm"
-                                            data-title="Proses Laporan?" 
-                                            data-text="Pindahkan ke pengerjaan?"
-                                            data-icon="info">
-                                        PROSES
+                                    <button type="button" class="btn btn-warning btn-action text-dark rounded-pill btn-confirm shadow-sm"
+                                            data-title="Proses Laporan?" data-text="Kerjakan laporan?" data-icon="info">
+                                        PROCES
                                     </button>
                                 </form>
                             {% elif report.status == 'IN_PROGRESS' %}
                                 <form method="POST" action="{% url 'update_status' report.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <input type="hidden" name="status" value="RESOLVED">
-                                    <button type="button" class="btn btn-success btn-sm rounded-pill px-3 btn-confirm shadow-sm"
-                                            data-title="Selesaikan Laporan?" 
-                                            data-text="Pastikan semua sudah tuntas."
-                                            data-icon="success">
-                                        SELESAI
+                                    <button type="button" class="btn btn-success btn-action rounded-pill btn-confirm shadow-sm"
+                                            data-title="Selesaikan Laporan?" data-text="Sudah tuntas?" data-icon="success">
+                                        FINISH
                                     </button>
                                 </form>
                             {% endif %}
 
-                            <a href="{% url 'update_report' report.id %}" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm">
-                                EDIT
+                            <a href="{% url 'update_report' report.id %}" class="btn btn-outline-warning btn-action rounded-pill shadow-sm">
+                                UPDATE
                             </a>
                             
-                            <a href="{% url 'delete_report' report.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm">
-                                HAPUS
+                            <a href="{% url 'delete_report' report.id %}" class="btn btn-outline-danger btn-action rounded-pill shadow-sm">
+                                DELETE
                             </a>
                         </div>
                     </td>
@@ -176,7 +180,7 @@
 <script>
     document.querySelectorAll('.btn-confirm').forEach(button => {
         button.addEventListener('click', function(e) {
-            e.preventDefault(); // Mencegah form terkirim otomatis
+            e.preventDefault(); 
             const title = this.getAttribute('data-title');
             const text = this.getAttribute('data-text');
             const icon = this.getAttribute('data-icon') || 'question';
@@ -189,7 +193,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#27ae60',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Lanjutkan!',
+                confirmButtonText: 'Ya!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {

@@ -148,6 +148,4 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
-
-# Paksa penyimpanan pesan ke dalam Session agar tidak hilang saat redirect
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
