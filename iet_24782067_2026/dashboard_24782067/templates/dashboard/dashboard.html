@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>Dashboard Statistik</h1>
-    <p>Halaman ini dapat diakses Admin, Citizen, dan Guest.</p>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-3">Dashboard Statistik</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p>Halaman ini dapat diakses Admin, Citizen, dan Guest.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
