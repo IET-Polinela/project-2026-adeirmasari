@@ -39,7 +39,7 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="mb-3">5 Laporan Terbaru (Reported)</h5>
-          <table class="table table-bordered table-striped">
+          <table class="table table-bordered table-striped table-hover">
             <thead class="table-light">
               <tr>
                 <th>Judul</th>
@@ -57,7 +57,7 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="mb-3">5 Laporan Selesai (Resolved)</h5>
-          <table class="table table-bordered table-striped">
+          <table class="table table-bordered table-striped table-hover">
             <thead class="table-light">
               <tr>
                 <th>Judul</th>
@@ -73,12 +73,76 @@
   </div>
 
 </div>
+
+<!-- Modal Detail Laporan -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailModalLabel">Detail Laporan</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+// FUNGSI POINT 2: Menampilkan Detail via AJAX/Fetch API
+function showDetail(id) {
+    const modalBody = document.getElementById('modalBody');
+    const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+    
+    // Tampilkan loading spinner
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Mengambil data...</p>
+        </div>`;
+    detailModal.show();
+
+    // Fetch ke endpoint JSON yang sudah ada di urls.py
+    fetch(`/report/${id}/json/`)
+        .then(response => {
+            if (!response.ok) throw new Error('Gagal mengambil detail laporan');
+            return response.json();
+        })
+        .then(report => {
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-sm table-borderless">
+                            <tr><th width="30%">Judul</th><td>: ${report.title}</td></tr>
+                            <tr><th>Kategori</th><td>: <span class="badge bg-info text-dark">${report.category}</span></td></tr>
+                            <tr><th>Lokasi</th><td>: ${report.location}</td></tr>
+                            <tr><th>Status</th><td>: <span class="badge bg-secondary">${report.status}</span></td></tr>
+                            <tr><th>Tanggal</th><td>: ${report.created_at}</td></tr>
+                        </table>
+                        <hr>
+                        <h6>Deskripsi:</h6>
+                        <p class="p-3 bg-light border rounded">${report.description || 'Tidak ada deskripsi.'}</p>
+                    </div>
+                </div>`;
+        })
+        .catch(error => {
+            modalBody.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        });
+}
+
+// FETCH DATA DASHBOARD (Stats & Tables)
 fetch('/dashboard/stats/')
   .then(response => {
     if (!response.ok) {
@@ -133,12 +197,13 @@ fetch('/dashboard/stats/')
       }
     });
 
+    // ===== TABEL REPORTED (Update dengan Onclick Point 2) =====
     const reportedTable = document.getElementById('reportedTable');
     if (data.reported.length === 0) {
       reportedTable.innerHTML = '<tr><td colspan="3" class="text-center">Tidak ada laporan REPORTED.</td></tr>';
     } else {
       reportedTable.innerHTML = data.reported.map(item => `
-        <tr>
+        <tr onclick="showDetail(${item.id})" style="cursor: pointer;">
           <td>${item.title}</td>
           <td>${item.category}</td>
           <td>${item.location}</td>
@@ -146,12 +211,13 @@ fetch('/dashboard/stats/')
       `).join('');
     }
 
+    // ===== TABEL RESOLVED (Update dengan Onclick Point 2) =====
     const resolvedTable = document.getElementById('resolvedTable');
     if (data.resolved.length === 0) {
       resolvedTable.innerHTML = '<tr><td colspan="3" class="text-center">Tidak ada laporan RESOLVED.</td></tr>';
     } else {
       resolvedTable.innerHTML = data.resolved.map(item => `
-        <tr>
+        <tr onclick="showDetail(${item.id})" style="cursor: pointer;">
           <td>${item.title}</td>
           <td>${item.category}</td>
           <td>${item.location}</td>

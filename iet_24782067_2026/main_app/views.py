@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.db.models import Q
 from .models import Report
 from .forms import ReportForm
 from django.contrib import messages
@@ -26,6 +29,35 @@ class ReportDetailView(LoginRequiredMixin, DetailView):
     model = Report
     template_name = 'main_app/report_detail.html'
     context_object_name = 'report'
+
+@login_required
+def report_search(request):
+    query = request.GET.get('q', '').strip()
+    reports = Report.objects.all()
+    if query:
+        reports = reports.filter(
+            Q(title__icontains=query) |
+            Q(category__icontains=query) |
+            Q(location__icontains=query) |
+            Q(description__icontains=query)
+        )
+    
+    # TAMBAHKAN 'category' di dalam .values() agar saat dirender ulang via JS, kolom kategori tidak hilang
+    reports = reports.order_by('-id').values('id', 'title', 'location', 'status', 'category')[:100]
+    return JsonResponse({'reports': list(reports)})
+
+@login_required
+def report_detail_json(request, pk):
+    report = get_object_or_404(Report, pk=pk)
+    return JsonResponse({
+        'id': report.id,
+        'title': report.title,
+        'category': report.category,
+        'location': report.location,
+        'description': report.description,
+        'status': report.status,
+        'created_at': report.created_at.strftime('%d %B %Y %H:%M'),
+    })
 
 # --- CREATE ---
 # Menangani path('add/', ReportCreateView.as_view(), name='add_report')
