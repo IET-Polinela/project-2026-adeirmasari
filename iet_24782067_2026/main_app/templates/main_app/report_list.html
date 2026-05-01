@@ -216,28 +216,73 @@ function fetchDetail(id) {
         }, 300);
     });
 
-    function renderReports(reports) {
-        if (reports.length === 0) {
-            reportTableBody.innerHTML = '<tr><td colspan="5" class="text-muted">Tidak ada laporan ditemukan.</td></tr>';
-            return;
+function renderReports(reports) {
+    if (reports.length === 0) {
+        reportTableBody.innerHTML = '<tr><td colspan="5" class="text-muted">Tidak ada laporan ditemukan.</td></tr>';
+        return;
+    }
+
+    reportTableBody.innerHTML = reports.map((r, i) => {
+        // 1. Logika Warna Badge
+        let badgeClass = 'bg-secondary';
+        if (r.status === 'VERIFIED') badgeClass = 'bg-primary';
+        else if (r.status === 'IN_PROGRESS') badgeClass = 'bg-warning text-dark';
+        else if (r.status === 'RESOLVED') badgeClass = 'bg-success';
+
+        // 2. Logika Tombol Aksi Dinamis (Verified/Process/Finish)
+        let actionButton = '';
+        if (r.status === 'REPORTED') {
+            actionButton = `
+                <form method="POST" action="/update-status/${r.id}/" class="d-inline">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                    <input type="hidden" name="status" value="VERIFIED">
+                    <button type="button" class="btn btn-primary btn-action rounded-pill btn-confirm shadow-sm" 
+                            data-title="Verifikasi Laporan?" data-text="Validkan laporan?" data-icon="question">
+                        VERIFIED
+                    </button>
+                </form>`;
+        } else if (r.status === 'VERIFIED') {
+            actionButton = `
+                <form method="POST" action="/update-status/${r.id}/" class="d-inline">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                    <input type="hidden" name="status" value="IN_PROGRESS">
+                    <button type="button" class="btn btn-warning btn-action text-dark rounded-pill btn-confirm shadow-sm"
+                            data-title="Proses Laporan?" data-text="Kerjakan laporan?" data-icon="info">
+                        PROCES
+                    </button>
+                </form>`;
+        } else if (r.status === 'IN_PROGRESS') {
+            actionButton = `
+                <form method="POST" action="/update-status/${r.id}/" class="d-inline">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                    <input type="hidden" name="status" value="RESOLVED">
+                    <button type="button" class="btn btn-success btn-action rounded-pill btn-confirm shadow-sm"
+                            data-title="Selesaikan Laporan?" data-text="Sudah tuntas?" data-icon="success">
+                        FINISH
+                    </button>
+                </form>`;
         }
-        reportTableBody.innerHTML = reports.map((r, i) => `
+
+        return `
             <tr>
                 <td>${i + 1}</td>
                 <td><strong>${r.title}</strong></td>
                 <td>${r.location}</td>
-                <td><span class="badge bg-info">${r.status}</span></td>
+                <td><span class="badge ${badgeClass}">${r.status}</span></td>
                 <td>
                     <div class="action-group">
                         <button type="button" class="btn btn-info btn-action text-white rounded-pill detail-button" data-report-id="${r.id}">DETAILS</button>
+                        ${actionButton}
                         <a href="/update/${r.id}/" class="btn btn-outline-warning btn-action rounded-pill">UPDATE</a>
                         <a href="/delete/${r.id}/" class="btn btn-outline-danger btn-action rounded-pill">DELETE</a>
                     </div>
                 </td>
             </tr>
-        `).join('');
-        bindButtons(); // Re-bind SweetAlert untuk tombol baru
-    }
+        `;
+    }).join('');
+    
+    bindButtons(); // Menjalankan ulang SweetAlert untuk tombol baru
+}
 
     // SweetAlert Confirmation
     function bindButtons() {
