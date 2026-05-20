@@ -21,10 +21,7 @@ class ReportListView(LoginRequiredMixin, ListView):
     model = Report
     template_name = 'main_app/report_list.html'
     context_object_name = 'reports'
-    ordering = ['-id']
-
-    def get_queryset(self):
-        return Report.objects.exclude(status='DRAFT').order_by('-id')
+    ordering = ['-id']  # Menampilkan laporan terbaru di atas
 
 # --- DETAIL ---
 # Menangani path('report/<int:pk>/', ReportDetailView.as_view(), name='report_detail')

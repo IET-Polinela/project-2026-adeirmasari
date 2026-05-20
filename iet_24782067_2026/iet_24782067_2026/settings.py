@@ -40,12 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'usermanagement_24782067',
     'dashboard_24782067',
-
-    'rest_framework',
     
     'main_app',
     'about',
-    'contacts',    
+    'contacts',
+
+    'rest_framework',
+    'rest_framework_simplejwt',    
 ]
 
 MIDDLEWARE = [
@@ -151,3 +152,14 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
