@@ -64,7 +64,7 @@ const routes = {
                     </h5>
 
                     <p>
-                        Koneksi API untuk data laporan akan diimplementasikan pada Lab 12.
+                        Sampaikan Permasalahan Yang ingin Anda Laporkan.
                     </p>
 
                 </div>
