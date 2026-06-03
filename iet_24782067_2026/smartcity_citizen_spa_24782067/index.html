@@ -46,5 +46,107 @@
     <script src="js/app.js"></script>
     <script src="js/router.js"></script>
 
+    <!-- Modal Laporan -->
+<div class="modal fade" id="reportModal" tabindex="-1"
+     aria-labelledby="reportModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+            <div class="modal-header bg-primary text-white">
+
+                <h5 class="modal-title fw-bold" id="reportModalLabel">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Buat Laporan Baru
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body p-4">
+
+                <form id="reportForm">
+
+                    <!-- Judul -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Judul Laporan
+                        </label>
+                        <input type="text"
+                               id="title"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <!-- Kategori -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Kategori
+                        </label>
+                        <select id="category"
+                                class="form-select"
+                                required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="Jalan Rusak">Jalan Rusak</option>
+                            <option value="Drainase">Drainase</option>
+                            <option value="Sampah">Sampah</option>
+                            <option value="Lampu Jalan">Lampu Jalan</option>
+                        </select>
+                    </div>
+
+                    <!-- Lokasi -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Lokasi
+                        </label>
+                        <input type="text"
+                               id="location"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Deskripsi
+                        </label>
+                        <textarea id="description"
+                                  class="form-control"
+                                  rows="4"
+                                  required></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary fw-bold px-4"
+                                id="btnDraft">
+                            Simpan Draft
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-primary fw-bold px-4"
+                                id="btnSubmit">
+                            Ajukan
+                            <i class="bi bi-send-fill ms-1"></i>
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 </body>
 </html>
