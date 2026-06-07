@@ -4,23 +4,102 @@ let currentPage = 1;
 let allReports = [];
 let totalPages = 1;
 
-let editingReportId = null;
-
+// ==========================
+// LOAD DATA DARI API
+// ==========================
 async function loadDashboardData(
     tab = currentTab,
     page = currentPage
 ) {
-    console.log("Load Dashboard:", tab, page);
+    currentTab = tab;
+    currentPage = page;
+
+    const response = await requestAPI(
+        `/api/report/?tab=${tab}&page=${page}`,
+        'GET'
+    );
+
+    if (response.status === 200) {
+        const data = await response.json();
+
+        // Ekstraksi data pagination
+        allReports = data.results || [];
+        totalPages = Math.ceil((data.count || 0) / 10);
+        if (totalPages < 1) totalPages = 1;
+
+        // Update UI
+        renderList();
+        renderPagination();
+    }
 }
 
+// ==========================
+// RENDER CARD LAPORAN
+// ==========================
 function renderList() {
-    console.log("Render List");
+    const listContainer = document.getElementById('listContainer');
+    if (!listContainer) return;
+
+    if (allReports.length === 0) {
+        listContainer.innerHTML = `
+            <div class="alert alert-secondary text-center">
+                Belum ada laporan
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+
+    allReports.forEach(report => {
+        let progress = 10;
+
+        if (report.status === 'REPORTED') progress = 25;
+        if (report.status === 'VERIFIED') progress = 50;
+        if (report.status === 'IN_PROGRESS') progress = 75;
+        if (report.status === 'RESOLVED') progress = 100;
+
+        html += `
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-body">
+                <h5 class="fw-bold">${report.title}</h5>
+                <p class="text-muted">${report.category}</p>
+                <p>${report.description}</p>
+                <small class="text-muted">${report.location}</small>
+
+                <div class="progress mt-3">
+                    <div class="progress-bar" role="progressbar"
+                        style="width:${progress}%">
+                        ${report.status}
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    });
+
+    listContainer.innerHTML = html;
 }
 
+// ==========================
+// PAGINATION
+// ==========================
 function renderPagination() {
-    console.log("Render Pagination");
-}
+    const paginationContainer =
+        document.getElementById('paginationContainer');
+    if (!paginationContainer) return;
 
-async function loadSummaryStats() {
-    console.log("Load Summary");
+    let html = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+        html += `
+        <button
+            class="btn btn-outline-primary btn-sm m-1"
+            onclick="loadDashboardData('${currentTab}', ${i})">
+            ${i}
+        </button>
+        `;
+    }
+
+    paginationContainer.innerHTML = html;
 }

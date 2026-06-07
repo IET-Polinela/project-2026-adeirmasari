@@ -39,55 +39,61 @@ const routes = {
     '#dashboard': `
         <div class="row g-4">
 
+            <!-- Sidebar Kiri -->
             <aside class="col-12 col-lg-3">
-
-                <div class="card border-0 p-3 shadow-sm sticky-top"
-                     style="top:20px;">
-
-                    <button class="btn btn-primary btn-lg w-100 fw-bold mb-3">
+                <div class="card border-0 shadow-sm p-3 sticky-top" style="top:20px;">
+                    <button
+                        id="btnNewReport"
+                        class="btn btn-primary btn-lg w-100 fw-bold mb-3">
                         <i class="bi bi-plus-circle-fill me-2"></i>
                         Laporan Baru
                     </button>
-
                 </div>
-
             </aside>
 
+            <!-- Konten Tengah -->
             <section class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
 
-                <div class="card border-0 p-5 shadow-sm text-center text-muted border-dashed">
+                        <!-- TAB -->
+                        <div class="btn-group w-100 mb-4">
+                            <button id="btnMyReports" class="btn btn-outline-primary">
+                                Laporan Saya
+                            </button>
+                            <button id="btnFeed" class="btn btn-outline-primary">
+                                Feed Kota
+                            </button>
+                        </div>
 
-                    <i class="bi bi-inbox fs-1"></i>
+                        <!-- LIST -->
+                        <div id="listContainer" class="row g-3"></div>
 
-                    <h5 class="mt-3">
-                        Selamat Datang!
-                    </h5>
+                        <!-- PAGINATION -->
+                        <div id="paginationContainer" class="mt-4 text-center"></div>
 
-                    <p>
-                        Sampaikan Permasalahan Yang ingin Anda Laporkan.
-                    </p>
-
+                    </div>
                 </div>
-
             </section>
 
+            <!-- Sidebar Kanan -->
             <aside class="col-12 col-lg-3 d-none d-lg-block">
-
-                <div class="card border-0 p-3 shadow-sm sticky-top"
-                     style="top:20px;">
-
+                <div class="card border-0 shadow-sm p-3 sticky-top" style="top:20px;">
                     <h6 class="fw-bold">
                         <i class="bi bi-info-circle-fill text-primary me-2"></i>
                         Pengumuman
                     </h6>
-
+                    <p class="small text-muted">Smart City Portal</p>
                 </div>
-
             </aside>
 
         </div>
     `
 };
+
+// ==========================
+// ROUTER HANDLER
+// ==========================
 
 function handleRouting() {
 
@@ -96,10 +102,38 @@ function handleRouting() {
     document.getElementById('app-content').innerHTML =
         routes[hash] || routes['#login'];
 
+    // LOGIN
     if (hash === '#login' && typeof setupLoginForm === 'function') {
         setupLoginForm();
     }
+
+    // DASHBOARD
+    if (hash === '#dashboard' && typeof loadDashboardData === 'function') {
+
+        // Load awal
+        loadDashboardData('my_reports', 1);
+
+        // Binding tombol tab (AMAN tanpa setTimeout)
+        const btnMyReports = document.getElementById('btnMyReports');
+        const btnFeed = document.getElementById('btnFeed');
+
+        if (btnMyReports) {
+            btnMyReports.onclick = () => {
+                loadDashboardData('my_reports', 1);
+            };
+        }
+
+        if (btnFeed) {
+            btnFeed.onclick = () => {
+                loadDashboardData('feed', 1);
+            };
+        }
+    }
 }
+
+// ==========================
+// EVENT LISTENER
+// ==========================
 
 window.addEventListener('hashchange', handleRouting);
 window.addEventListener('DOMContentLoaded', handleRouting);
