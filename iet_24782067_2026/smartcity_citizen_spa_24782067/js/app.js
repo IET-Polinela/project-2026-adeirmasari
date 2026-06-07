@@ -3,6 +3,7 @@ let currentPage = 1;
 
 let allReports = [];
 let totalPages = 1;
+let editingReportId = null;
 
 // ==========================
 // LOAD DATA DARI API
@@ -78,6 +79,37 @@ async function loadSummaryStats() {
 }
 
 // ==========================
+// EDIT DRAFT (LANGKAH 5)
+// ==========================
+async function editDraft(id) {
+
+    const response = await requestAPI(
+        `/api/report/${id}/`,
+        'GET'
+    );
+
+    if (response.status === 200) {
+        const report = await response.json();
+
+        // Isi form modal
+        document.getElementById('title').value = report.title;
+        document.getElementById('category').value = report.category;
+        document.getElementById('location').value = report.location;
+        document.getElementById('description').value = report.description;
+
+        // Set mode edit
+        editingReportId = id;
+
+        // Tampilkan modal
+        const modal = new bootstrap.Modal(
+            document.getElementById('reportModal')
+        );
+        modal.show();
+    }
+}
+
+
+// ==========================
 // RENDER CARD LAPORAN
 // ==========================
 function renderList() {
@@ -117,6 +149,14 @@ function renderList() {
                         ${report.status}
                     </div>
                 </div>
+            ${report.status === 'REPORTED' ? `
+            <button
+                class="btn btn-warning btn-sm mt-3"
+                onclick="editDraft(${report.id})">
+                Edit Draft
+            </button>
+` : ''}
+
             </div>
         </div>
         `;
@@ -146,4 +186,56 @@ function renderPagination() {
     }
 
     paginationContainer.innerHTML = html;
+}
+
+// ==========================
+// SUBMIT MODAL (POST / PUT)
+// ==========================
+const reportForm = document.getElementById('reportForm');
+
+if (reportForm) {
+    reportForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const payload = {
+            title: document.getElementById('title').value,
+            category: document.getElementById('category').value,
+            location: document.getElementById('location').value,
+            description: document.getElementById('description').value
+        };
+
+        let response;
+
+        // MODE TAMBAH
+        if (editingReportId === null) {
+            response = await requestAPI(
+                '/api/report/',
+                'POST',
+                payload
+            );
+        }
+        // MODE EDIT
+        else {
+            response = await requestAPI(
+                `/api/report/${editingReportId}/`,
+                'PUT',
+                payload
+            );
+        }
+
+        if (response.status === 201 || response.status === 200) {
+
+            // Tutup modal
+            bootstrap.Modal.getInstance(
+                document.getElementById('reportModal')
+            ).hide();
+
+            // Reset & kembalikan mode
+            reportForm.reset();
+            editingReportId = null;
+
+            // Reload dashboard TANPA refresh browser
+            loadDashboardData();
+        }
+    });
 }
