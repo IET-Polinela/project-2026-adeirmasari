@@ -36,59 +36,82 @@ const routes = {
         </div>
     `,
 
-    '#dashboard': `
-        <div class="row g-4">
+'#dashboard': `
+<div class="row g-4">
 
-            <!-- Sidebar Kiri -->
-            <aside class="col-12 col-lg-3">
-                <div class="card border-0 shadow-sm p-3 sticky-top" style="top:20px;">
-                    <button
-                        id="btnNewReport"
-                        class="btn btn-primary btn-lg w-100 fw-bold mb-3">
-                        <i class="bi bi-plus-circle-fill me-2"></i>
-                        Laporan Baru
-                    </button>
-                </div>
-            </aside>
+    <!-- SIDEBAR KIRI -->
+    <aside class="col-12 col-lg-3">
 
-            <!-- Konten Tengah -->
-            <section class="col-12 col-lg-6">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
+        <!-- BUTTON -->
+        <div class="card border-0 shadow-sm p-3 sticky-top" style="top:20px;">
+            <button
+                id="btnNewReport"
+                class="btn btn-primary btn-lg w-100 fw-bold mb-3">
+                <i class="bi bi-plus-circle-fill me-2"></i>
+                Laporan Baru
+            </button>
 
-                        <!-- TAB -->
-                        <div class="btn-group w-100 mb-4">
-                            <button id="btnMyReports" class="btn btn-outline-primary">
-                                Laporan Saya
-                            </button>
-                            <button id="btnFeed" class="btn btn-outline-primary">
-                                Feed Kota
-                            </button>
-                        </div>
+            <!-- REKAP LAPORAN (WAJIB ADA - LANGKAH 4) -->
+            <div class="card border-0 shadow-sm p-3 mt-3">
+                <h6 class="fw-bold mb-3">Rekap Laporan</h6>
 
-                        <!-- LIST -->
-                        <div id="listContainer" class="row g-3"></div>
+                <p class="mb-1">
+                    Draft :
+                    <span id="statDraft" class="fw-bold">0</span>
+                </p>
 
-                        <!-- PAGINATION -->
-                        <div id="paginationContainer" class="mt-4 text-center"></div>
+                <p class="mb-1">
+                    Diproses :
+                    <span id="statProcess" class="fw-bold">0</span>
+                </p>
 
-                    </div>
-                </div>
-            </section>
-
-            <!-- Sidebar Kanan -->
-            <aside class="col-12 col-lg-3 d-none d-lg-block">
-                <div class="card border-0 shadow-sm p-3 sticky-top" style="top:20px;">
-                    <h6 class="fw-bold">
-                        <i class="bi bi-info-circle-fill text-primary me-2"></i>
-                        Pengumuman
-                    </h6>
-                    <p class="small text-muted">Smart City Portal</p>
-                </div>
-            </aside>
+                <p class="mb-0">
+                    Selesai :
+                    <span id="statDone" class="fw-bold">0</span>
+                </p>
+            </div>
 
         </div>
-    `
+    </aside>
+
+    <!-- KONTEN TENGAH -->
+    <section class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+
+                <!-- TAB -->
+                <div class="btn-group w-100 mb-4">
+                    <button id="btnMyReports" class="btn btn-outline-primary">
+                        Laporan Saya
+                    </button>
+                    <button id="btnFeed" class="btn btn-outline-primary">
+                        Feed Kota
+                    </button>
+                </div>
+
+                <!-- LIST -->
+                <div id="listContainer" class="row g-3"></div>
+
+                <!-- PAGINATION -->
+                <div id="paginationContainer" class="mt-4 text-center"></div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SIDEBAR KANAN -->
+    <aside class="col-12 col-lg-3 d-none d-lg-block">
+        <div class="card border-0 shadow-sm p-3 sticky-top" style="top:20px;">
+            <h6 class="fw-bold">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                Pengumuman
+            </h6>
+            <p class="small text-muted">Smart City Portal</p>
+        </div>
+    </aside>
+
+</div>
+`
 };
 
 // ==========================

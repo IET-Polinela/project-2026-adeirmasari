@@ -30,6 +30,50 @@ async function loadDashboardData(
         // Update UI
         renderList();
         renderPagination();
+
+// LANGKAH 4: Rekap Sidebar
+        loadSummaryStats();
+    }
+}
+
+// ==========================
+// REKAP STATUS LAPORAN (LANGKAH 4)
+// ==========================
+async function loadSummaryStats() {
+
+    // Cegah error kalau bukan di dashboard
+    const statDraft = document.getElementById('statDraft');
+    const statProcess = document.getElementById('statProcess');
+    const statDone = document.getElementById('statDone');
+
+    if (!statDraft || !statProcess || !statDone) return;
+
+    const response = await requestAPI(
+        `/api/report/?tab=my_reports&page_size=1000`,
+        'GET'
+    );
+
+    if (response.status === 200) {
+        const data = await response.json();
+        const reports = data.results || [];
+
+        // HITUNG STATUS
+        const draftCount = reports.filter(
+            r => r.status === 'REPORTED'
+        ).length;
+
+        const processCount = reports.filter(
+            r => r.status === 'VERIFIED' || r.status === 'IN_PROGRESS'
+        ).length;
+
+        const doneCount = reports.filter(
+            r => r.status === 'RESOLVED'
+        ).length;
+
+        // UPDATE SIDEBAR
+        statDraft.textContent = draftCount;
+        statProcess.textContent = processCount;
+        statDone.textContent = doneCount;
     }
 }
 
