@@ -1,15 +1,35 @@
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = "http://127.0.0.1:8000";
 
-async function requestAPI(endpoint, method = 'GET', bodyData = null) {
+let isRedirectingToLogin = false;
 
-    const accessToken = localStorage.getItem('access_token');
+function getAccessToken() {
+    return localStorage.getItem("access_token");
+}
 
+function clearLoginData() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+}
+
+function redirectToLogin() {
+    if (isRedirectingToLogin) return;
+
+    isRedirectingToLogin = true;
+    clearLoginData();
+
+    window.location.hash = "#login";
+}
+
+async function requestAPI(endpoint, method = "GET", bodyData = null) {
     const headers = {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
     };
 
-    if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
+    const token = getAccessToken();
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
     }
 
     const config = {
@@ -17,14 +37,41 @@ async function requestAPI(endpoint, method = 'GET', bodyData = null) {
         headers: headers
     };
 
-    if (bodyData) {
+    if (bodyData !== null) {
         config.body = JSON.stringify(bodyData);
     }
 
-    const response = await fetch(
-        API_BASE_URL + endpoint,
-        config
-    );
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-    return response;
+        if (response.status === 401) {
+            redirectToLogin();
+        }
+
+        return response;
+
+    } catch (error) {
+        console.error("Gagal terhubung ke API:", error);
+        throw error;
+    }
+}
+
+function getAPI(endpoint) {
+    return requestAPI(endpoint, "GET");
+}
+
+function postAPI(endpoint, bodyData) {
+    return requestAPI(endpoint, "POST", bodyData);
+}
+
+function putAPI(endpoint, bodyData) {
+    return requestAPI(endpoint, "PUT", bodyData);
+}
+
+function patchAPI(endpoint, bodyData) {
+    return requestAPI(endpoint, "PATCH", bodyData);
+}
+
+function deleteAPI(endpoint) {
+    return requestAPI(endpoint, "DELETE");
 }

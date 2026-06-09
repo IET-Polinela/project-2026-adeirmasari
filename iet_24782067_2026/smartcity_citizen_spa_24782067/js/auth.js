@@ -1,66 +1,57 @@
 function setupLoginForm() {
-
-    const form =
-        document.getElementById('loginForm');
+    const form = document.getElementById("loginForm");
 
     if (!form) return;
 
-    form.addEventListener('submit',
-        async function (event) {
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-            event.preventDefault();
+        const usernameInput = document.getElementById("loginUsername");
+        const passwordInput = document.getElementById("loginPassword");
 
-            const username =
-                document.getElementById('loginUsername').value;
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
 
-            const password =
-                document.getElementById('loginPassword').value;
+        if (!username || !password) {
+            alert("Username dan password wajib diisi.");
+            return;
+        }
+
+        try {
+            const response = await requestAPI("/api/token/", "POST", {
+                username: username,
+                password: password
+            });
+
+            let data = null;
 
             try {
-
-                const response =
-                    await requestAPI(
-                        '/api/token/',
-                        'POST',
-                        {
-                            username: username,
-                            password: password
-                        }
-                    );
-
-                const data =
-                    await response.json();
-
-                if (response.status === 200) {
-
-                    localStorage.setItem(
-                        'access_token',
-                        data.access
-                    );
-
-                    localStorage.setItem(
-                        'refresh_token',
-                        data.refresh
-                    );
-
-                    alert('Login berhasil');
-
-                    window.location.hash =
-                        '#dashboard';
-
-                } else {
-
-                    alert('Username atau Password salah');
-
-                }
-
+                data = await response.json();
             } catch (error) {
-
-                console.error(error);
-
-                alert('Gagal terhubung ke server');
-
+                data = null;
             }
 
-        });
+            if (response.status === 200 && data && data.access) {
+                localStorage.setItem("access_token", data.access);
+                localStorage.setItem("refresh_token", data.refresh);
+
+                window.location.hash = "#dashboard";
+                return;
+            }
+
+            alert("Username atau password salah.");
+
+        } catch (error) {
+            console.error(error);
+            alert("Gagal terhubung ke server.");
+        }
+    });
+}
+
+function logoutUser() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+
+    window.location.hash = "#login";
 }
