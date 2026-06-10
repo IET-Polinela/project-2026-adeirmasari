@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-nd@y9ikg#3dkf1-0m=-3*2u0w)mc4ws1brj61pv35iq5t75bfc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
 
 
 # Application definition
@@ -62,7 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'iet_24782067_2026.urls'
+ROOT_URLCONF = 'smartcity_app.urls'
 
 TEMPLATES = [
     {
@@ -80,7 +81,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'iet_24782067_2026.wsgi.application'
+WSGI_APPLICATION = 'smartcity_app.wsgi.application'
 
 
 # Database
@@ -136,6 +137,8 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static", 
 ]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 AUTH_USER_MODEL = 'usermanagement_24782067.CustomUser'
 
