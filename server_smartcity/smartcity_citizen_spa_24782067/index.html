@@ -11,15 +11,107 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <style>
-        body {
-            background-color: #f4f6f9;
-        }
+<style>
+    :root {
+        --green-primary: #198754;
+        --green-dark: #146c43;
+        --green-light: #d1e7dd;
+        --green-soft: #f1f8f4;
+    }
 
-        .spa-container {
-            min-height: calc(100vh - 80px);
-        }
-    </style>
+    body {
+        background-color: #f4f8f5;
+    }
+
+    .spa-container {
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Navbar */
+    .navbar.bg-primary {
+        background-color: var(--green-primary) !important;
+    }
+
+    /* Semua elemen Bootstrap Primary */
+    .bg-primary {
+        background-color: var(--green-primary) !important;
+    }
+
+    .text-primary {
+        color: var(--green-primary) !important;
+    }
+
+    /* Tombol */
+    .btn-primary {
+        background-color: var(--green-primary) !important;
+        border-color: var(--green-primary) !important;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--green-dark) !important;
+        border-color: var(--green-dark) !important;
+    }
+
+    .btn-outline-primary {
+        color: var(--green-primary) !important;
+        border-color: var(--green-primary) !important;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--green-primary) !important;
+        border-color: var(--green-primary) !important;
+        color: white !important;
+    }
+
+    /* Badge */
+    .badge.bg-primary {
+        background-color: var(--green-primary) !important;
+    }
+
+    /* Progress Bar */
+    .progress-bar.bg-primary {
+        background-color: var(--green-primary) !important;
+    }
+
+    /* Alert JWT */
+    .alert-success {
+        background-color: var(--green-light) !important;
+        border-color: #b7d8c7 !important;
+        color: #0f5132 !important;
+    }
+
+    /* Modal Header */
+    .modal-header.bg-primary {
+        background-color: var(--green-primary) !important;
+    }
+
+    /* Input Focus */
+    .form-control:focus,
+    .form-select:focus,
+    textarea:focus {
+        border-color: var(--green-primary);
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    }
+
+    /* Card */
+    .card {
+        border-radius: 16px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #9fc5aa;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--green-primary);
+    }
+</style>
 </head>
 
 <body>
