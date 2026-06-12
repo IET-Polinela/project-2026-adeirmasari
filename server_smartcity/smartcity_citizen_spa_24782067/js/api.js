@@ -42,7 +42,7 @@ async function requestAPI(endpoint, method = "GET", bodyData = null) {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+        const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
         if (response.status === 401) {
             redirectToLogin();
