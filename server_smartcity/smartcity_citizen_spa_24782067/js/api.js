@@ -1,4 +1,4 @@
-conconst BASE_URL = "http://103.151.63.87:8003/api/";
+const BASE_URL = "http://103.151.63.87:8003/api/";
 
 let isRedirectingToLogin = false;
 
