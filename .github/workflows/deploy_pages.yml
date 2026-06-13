@@ -3,7 +3,7 @@ name: Deploy Frontend SPA to GitHub Pages
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 permissions:
   contents: read
