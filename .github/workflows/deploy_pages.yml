@@ -28,7 +28,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Sesuaikan path dengan folder SPA kamu
-          path: './smartcity_citizen_spa_24782067'
+          with:
+        path: './server_smartcity/smartcity_citizen_spa_24782067'
 
       - name: Deploy to GitHub Pages
         id: deployment
