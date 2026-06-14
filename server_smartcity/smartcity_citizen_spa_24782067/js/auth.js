@@ -18,7 +18,7 @@ function setupLoginForm() {
         }
 
         try {
-            const response = await requestAPI("/api/token/", "POST", {
+            const response = await requestAPI("token/", "POST", {
                 username: username,
                 password: password
             });
@@ -31,7 +31,7 @@ function setupLoginForm() {
                 data = null;
             }
 
-            if (response.status === 200 && data && data.access) {
+            if (response.ok && data && data.access) {
                 localStorage.setItem("access_token", data.access);
                 localStorage.setItem("refresh_token", data.refresh);
 
