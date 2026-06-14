@@ -21,7 +21,9 @@ class ReportListView(LoginRequiredMixin, ListView):
     model = Report
     template_name = 'main_app/report_list.html'
     context_object_name = 'reports'
-    ordering = ['-id']  # Menampilkan laporan terbaru di atas
+
+    def get_queryset(self):
+        return Report.objects.exclude(status='DRAFT').order_by('-id')
 
 # --- DETAIL ---
 # Menangani path('report/<int:pk>/', ReportDetailView.as_view(), name='report_detail')
@@ -33,7 +35,9 @@ class ReportDetailView(LoginRequiredMixin, DetailView):
 @login_required
 def report_search(request):
     query = request.GET.get('q', '').strip()
-    reports = Report.objects.all()
+
+    reports = Report.objects.filter(status="RESOLVED")
+
     if query:
         reports = reports.filter(
             Q(title__icontains=query) |
@@ -41,9 +45,11 @@ def report_search(request):
             Q(location__icontains=query) |
             Q(description__icontains=query)
         )
-    
-    # TAMBAHKAN 'category' di dalam .values() agar saat dirender ulang via JS, kolom kategori tidak hilang
-    reports = reports.order_by('-id').values('id', 'title', 'location', 'status', 'category')[:100]
+
+    reports = reports.order_by('-id').values(
+        'id', 'title', 'location', 'status', 'category'
+    )[:100]
+
     return JsonResponse({'reports': list(reports)})
 
 @login_required
@@ -146,3 +152,4 @@ class ReportUpdateStatusView(LoginRequiredMixin, View):
             report.save()
 
         return redirect('report_list')
+    
