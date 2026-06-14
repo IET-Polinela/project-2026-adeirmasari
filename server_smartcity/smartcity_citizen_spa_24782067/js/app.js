@@ -79,7 +79,7 @@ async function loadDashboardData(tab = "my_reports", page = 1) {
     currentPage = page;
 
     try {
-        const response = await requestAPI(`/api/report/?tab=${tab}&page=${page}`, "GET");
+        const response = await requestAPI(`report/?tab=${tab}&page=${page}`, "GET");
 
         if (response.status !== 200) {
             console.log("Gagal load dashboard:", response.status);
@@ -150,6 +150,7 @@ function renderList(reports) {
     }
 
     reports.forEach(function (report) {
+
         const ownerName = currentTab === "feed"
             ? "Warga Anonim"
             : report.is_owner ? "Anda" : "Warga Anonim";
@@ -254,7 +255,7 @@ function renderPagination(data) {
 
 async function editDraft(id) {
     try {
-        const response = await requestAPI(`/api/report/${id}/`, "GET");
+        const response = await requestAPI(`report/${id}/`, "GET");
 
         if (response.status !== 200) return;
 
@@ -291,14 +292,9 @@ async function submitReport(status) {
     const payload = getReportFormData();
     payload.status = status;
 
-    if (!payload.title || !payload.category || !payload.location || !payload.description) {
-        alert("Semua field laporan wajib diisi.");
-        return;
-    }
-
     const endpoint = editingReportId === null
-        ? "/api/report/"
-        : `/api/report/${editingReportId}/`;
+        ? "report/"
+        : `report/${editingReportId}/`;
 
     const method = editingReportId === null
         ? "POST"
@@ -315,12 +311,9 @@ async function submitReport(status) {
             data = null;
         }
 
-        console.log("STATUS SIMPAN:", response.status);
-        console.log("DATA SIMPAN:", data);
-
         if (response.status === 200 || response.status === 201) {
-            const form = document.getElementById("reportForm");
 
+            const form = document.getElementById("reportForm");
             if (form) form.reset();
 
             editingReportId = null;
@@ -335,11 +328,11 @@ async function submitReport(status) {
             return;
         }
 
-        alert("Gagal menyimpan laporan:\n" + JSON.stringify(data, null, 2));
+        alert("Gagal menyimpan:\n" + JSON.stringify(data, null, 2));
 
     } catch (error) {
-        console.error("Gagal submit laporan:", error);
-        alert("Gagal terhubung ke server.");
+        console.error("Error submit:", error);
+        alert("Gagal konek server");
     }
 }
 
@@ -358,7 +351,6 @@ function getProgressPercent(status) {
     if (status === "VERIFIED") return 60;
     if (status === "IN_PROGRESS") return 80;
     if (status === "RESOLVED") return 100;
-
     return 10;
 }
 
@@ -368,7 +360,6 @@ function getProgressClass(status) {
     if (status === "VERIFIED") return "bg-info";
     if (status === "IN_PROGRESS") return "bg-warning";
     if (status === "RESOLVED") return "bg-success";
-
     return "bg-secondary";
 }
 
@@ -378,16 +369,13 @@ function getStatusBadgeClass(status) {
     if (status === "VERIFIED") return "bg-info text-dark";
     if (status === "IN_PROGRESS") return "bg-warning text-dark";
     if (status === "RESOLVED") return "bg-success";
-
     return "bg-secondary";
 }
 
 function formatDateTime(dateString) {
     const date = new Date(dateString);
 
-    if (isNaN(date.getTime())) {
-        return "-";
-    }
+    if (isNaN(date.getTime())) return "-";
 
     return date.toLocaleDateString("id-ID", {
         day: "2-digit",
