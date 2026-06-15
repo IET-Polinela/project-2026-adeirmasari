@@ -31,10 +31,8 @@ class ReportViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(reporter=user)
 
         elif tab == 'feed':
-            queryset = queryset.filter(
-                ~Q(reporter=user) &
-                ~Q(status='DRAFT')
-            )
+            # TAMBAHAN FIX: FEED KOTA HANYA RESOLVED
+            queryset = queryset.filter(status='RESOLVED')
 
         else:
             queryset = queryset.filter(
