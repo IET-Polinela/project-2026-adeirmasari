@@ -18,6 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+# ===== TAMBAHAN UNTUK OPENAPI =====
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django_scalar.views import scalar_viewer
+# =================================
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main_app.urls')),
@@ -25,8 +30,28 @@ urlpatterns = [
     path('contacts/', include('contacts.urls')),
     path('', include('usermanagement_24782067.urls')),
     path('dashboard/', include('dashboard_24782067.urls')),
+
+    # ===== API ROUTES =====
     path('api/', include('main_app.api_urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/', include('usermanagement_24782067.api_urls')),
+
+    # ===== OPENAPI DOCUMENTATION =====
+    # 1. Schema mentah (JSON/YAML)
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+
+    # 2. Swagger UI
+    path(
+        'api/docs/swagger/',
+        SpectacularSwaggerView.as_view(url_name='schema'),
+        name='swagger-ui'
+    ),
+
+    # 3. Scalar UI
+    path(
+        'api/docs/scalar/',
+        scalar_viewer,
+        name='scalar-ui'
+    ),
 ]
