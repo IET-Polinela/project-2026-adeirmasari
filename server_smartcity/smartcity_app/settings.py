@@ -190,3 +190,10 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Smart City Portal API',
+    'DESCRIPTION': 'Dokumentasi REST API resmi untuk Portal Pelaporan Laporan Warga',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
