@@ -4,11 +4,12 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+
+{% if is_dashboard_allowed %}
 <div class="container-fluid px-4">
 
   <h2 class="mt-4 mb-4" style="color: white;">Dashboard</h2>
 
-  <!-- ===== ROW GRAFIK ===== -->
   <div class="row">
     <div class="col-md-6">
       <div class="card shadow-sm mb-4">
@@ -33,7 +34,6 @@
     </div>
   </div>
 
-  <!-- ===== ROW TABEL ===== -->
   <div class="row">
     <div class="col-md-6">
       <div class="card shadow-sm">
@@ -74,7 +74,6 @@
 
 </div>
 
-<!-- Modal Detail Laporan -->
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -95,6 +94,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
