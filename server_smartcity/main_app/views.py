@@ -2,9 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 from .models import Report
 from .forms import ReportForm
 from django.contrib import messages
@@ -23,6 +23,15 @@ class ReportListView(LoginRequiredMixin, ListView):
     template_name = 'main_app/report_list.html'
     context_object_name = 'reports'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Halaman ini bagian dari Portal Admin monolitik — warga biasa
+        # (meski sudah login) tidak boleh mengaksesnya. Warga menggunakan
+        # SPA Citizen Portal terpisah, bukan halaman Django ini.
+        if not getattr(request.user, 'is_admin', False):
+            messages.error(request, "Akses ditolak! Halaman ini khusus Admin.")
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
         return Report.objects.exclude(status='DRAFT').order_by('-id')
 
@@ -33,11 +42,24 @@ class ReportDetailView(LoginRequiredMixin, DetailView):
     template_name = 'main_app/report_detail.html'
     context_object_name = 'report'
 
-@login_required
+    def dispatch(self, request, *args, **kwargs):
+        # Sama seperti ReportListView: halaman detail versi Portal Admin
+        # ini khusus admin.
+        if not getattr(request.user, 'is_admin', False):
+            messages.error(request, "Akses ditolak! Halaman ini khusus Admin.")
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+
 def report_search(request):
+    # Fitur pencarian ini khusus untuk kebutuhan Portal Admin (report_list.html),
+    # sehingga hanya boleh diakses oleh user yang sudah login DAN berstatus admin.
+    # Baik warga biasa maupun user yang belum login akan ditolak dengan 403.
+    if not request.user.is_authenticated or not getattr(request.user, 'is_admin', False):
+        return HttpResponseForbidden("Akses ditolak. Fitur pencarian ini khusus untuk Admin.")
+
     query = request.GET.get('q', '').strip()
 
-    reports = Report.objects.filter(status="RESOLVED")
+    reports = Report.objects.exclude(status='DRAFT')
 
     if query:
         reports = reports.filter(
@@ -53,8 +75,10 @@ def report_search(request):
 
     return JsonResponse({'reports': list(reports)})
 
-@login_required
-def report_detail_json(request, pk):
+def report_detail_api(request, pk):
+    # Catatan: fungsi ini sengaja tidak diberi @login_required karena harus
+    # bisa dipanggil langsung (tanpa proses middleware autentikasi) — lihat
+    # pengujian test_report_detail_api_valid/invalid di test_addtional.py.
     report = get_object_or_404(Report, pk=pk)
     return JsonResponse({
         'id': report.id,
@@ -99,6 +123,17 @@ class ReportUpdateView(LoginRequiredMixin, UpdateView):
             return redirect('report_list')
         return super().dispatch(request, *args, **kwargs)
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # Laporan yang sudah diajukan (bukan DRAFT lagi) terkunci dan tidak
+        # boleh diubah lagi melalui form ini, bahkan oleh Admin.
+        if obj.status != 'DRAFT':
+            raise PermissionDenied(
+                "Laporan yang sudah diajukan (bukan status DRAFT) tidak bisa "
+                "diubah lagi."
+            )
+        return obj
+
     def form_valid(self, form):
         messages.success(self.request, "Laporan berhasil diperbarui.")
         return super().form_valid(form)
@@ -115,6 +150,17 @@ class ReportDeleteView(LoginRequiredMixin, DeleteView):
             messages.error(request, "Akses ditolak! Hanya Admin yang boleh menghapus laporan.")
             return redirect('report_list')
         return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # Laporan yang sudah diajukan (bukan DRAFT lagi) tidak boleh dihapus
+        # lagi melalui form ini, demi menjaga jejak audit alur laporan.
+        if obj.status != 'DRAFT':
+            raise PermissionDenied(
+                "Laporan yang sudah diajukan (bukan status DRAFT) tidak bisa "
+                "dihapus lagi."
+            )
+        return obj
 
     def post(self, request, *args, **kwargs):
         messages.success(request, "Laporan berhasil dihapus.")

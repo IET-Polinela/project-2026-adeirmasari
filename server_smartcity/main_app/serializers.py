@@ -3,7 +3,14 @@ from .models import Report
 
 
 class ReportSerializer(serializers.ModelSerializer):
+    # `reporter` SELALU menampilkan "Warga Anonim" untuk siapa pun yang
+    # membaca data ini (dipakai di feed publik / tab lain selain milik sendiri).
     reporter = serializers.SerializerMethodField()
+
+    # `reporter_name` menampilkan nama asli (username) HANYA jika request
+    # user yang mengakses adalah pemilik laporan tersebut.
+    reporter_name = serializers.SerializerMethodField()
+
     is_owner = serializers.SerializerMethodField()
 
     class Meta:
@@ -16,6 +23,7 @@ class ReportSerializer(serializers.ModelSerializer):
             'location',
             'status',
             'reporter',
+            'reporter_name',
             'is_owner',
             'created_at',
             'updated_at'
@@ -23,6 +31,7 @@ class ReportSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'reporter',
+            'reporter_name',
             'is_owner',
             'created_at',
             'updated_at'
@@ -37,6 +46,10 @@ class ReportSerializer(serializers.ModelSerializer):
         return False
 
     def get_reporter(self, obj):
+        # Selalu disamarkan, demi privasi di ruang publik (feed kota).
+        return "Warga Anonim"
+
+    def get_reporter_name(self, obj):
         request = self.context.get('request')
 
         if request and request.user and request.user.is_authenticated:

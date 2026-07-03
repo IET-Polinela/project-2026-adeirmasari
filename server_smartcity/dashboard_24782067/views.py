@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from main_app.models import Report
 from django.db.models import Count
 from django.contrib import messages
@@ -8,6 +9,27 @@ from django.contrib import messages
 class DashboardView(TemplateView):
 
     template_name = 'dashboard/dashboard.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Dashboard adalah halaman rahasia Admin. Sebelumnya halaman ini
+        # tetap dirender (200) untuk siapa pun, hanya menampilkan pesan
+        # peringatan — ini celah keamanan. Sekarang, non-admin (termasuk
+        # yang belum login) langsung dialihkan (redirect) dan tidak pernah
+        # melihat isi halaman dashboard sama sekali.
+        is_allowed = (
+            request.user.is_authenticated
+            and
+            getattr(request.user, 'is_admin', False)
+        )
+
+        if not is_allowed:
+            messages.warning(
+                request,
+                "Dashboard hanya dapat diakses administrator."
+            )
+            return redirect('report_list')
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(
         self,
@@ -18,18 +40,8 @@ class DashboardView(TemplateView):
             **kwargs
         )
 
-        context['is_dashboard_allowed'] = (
-            self.request.user.is_authenticated
-            and
-            self.request.user.is_admin
-        )
-
-        if not context['is_dashboard_allowed']:
-
-            messages.warning(
-                self.request,
-                "Dashboard hanya dapat diakses administrator."
-            )
+        # Jika sampai di sini, dispatch() sudah memastikan user adalah admin.
+        context['is_dashboard_allowed'] = True
 
         return context
 

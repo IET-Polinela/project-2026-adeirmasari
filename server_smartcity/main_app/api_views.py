@@ -39,8 +39,10 @@ class ReportViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(reporter=user)
 
         elif tab == 'feed':
-            # TAMBAHAN FIX: FEED KOTA HANYA RESOLVED
-            queryset = queryset.filter(status='RESOLVED')
+            # Feed kota bersifat publik: tampilkan semua laporan yang SUDAH
+            # diajukan (bukan DRAFT), apa pun status prosesnya
+            # (REPORTED/VERIFIED/IN_PROGRESS/RESOLVED).
+            queryset = queryset.exclude(status='DRAFT')
 
         else:
             queryset = queryset.filter(

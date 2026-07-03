@@ -185,4 +185,27 @@ class AuthenticationTests(APITestCase):
             Cek apakah user memiliki is_staff=True. Jika tidak, Django 
             memberikan respons HTTP 302.
         """
-        raise NotImplementedError("Skenario AUTH03 belum diimplementasi.")
+        # LANGKAH 1: Login sebagai warga biasa menggunakan session-based auth
+        # (bukan JWT, karena portal admin memakai Django login biasa)
+        login_success = self.client.login(
+            username='warga_test',
+            password='Password123!',
+        )
+        self.assertTrue(
+            login_success,
+            "Login warga_test seharusnya berhasil dengan kredensial yang benar"
+        )
+
+        # LANGKAH 2: Tentukan URL halaman dashboard admin
+        url = reverse('dashboard')
+
+        # LANGKAH 3: Warga biasa mencoba mengakses halaman dashboard
+        response = self.client.get(url)
+
+        # LANGKAH 4: Verifikasi bahwa akses ditolak dengan redirect (302)
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_302_FOUND,
+            "Warga biasa (non-admin) yang mencoba akses /dashboard/ harus "
+            "dialihkan (redirect) dengan status HTTP 302"
+        )

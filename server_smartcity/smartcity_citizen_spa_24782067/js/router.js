@@ -54,6 +54,7 @@ const routes = {
                             Rekap Status
                         </h5>
 
+                        <div id="summaryStats">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 <span>
@@ -95,6 +96,7 @@ const routes = {
                                 <span id="statDone" class="badge bg-success rounded-3">0</span>
                             </li>
                         </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -115,7 +117,7 @@ const routes = {
                             </p>
                         </div>
 
-                        <button id="btnAddReport"
+                        <button id="btnBukaModal"
                             class="btn btn-light fw-bold px-4">
                             <i class="bi bi-plus-circle me-2"></i>
                             Tambah Laporan Baru
@@ -143,7 +145,7 @@ const routes = {
                                     Laporan Saya
                                 </button>
 
-                                <button id="btnFeed" class="btn btn-outline-primary">
+                                <button id="tabFeedKota" class="btn btn-outline-primary">
                                     <i class="bi bi-globe2 me-1"></i>
                                     Feed Kota
                                 </button>
@@ -169,7 +171,7 @@ function getStoredUsername() {
 }
 
 function updateNavbar(hash) {
-    const navMenu = document.getElementById("nav-menu");
+    const navMenu = document.getElementById("nav-menus");
 
     if (!navMenu) return;
 
@@ -202,7 +204,7 @@ function updateNavbar(hash) {
 
 function updateActiveTabButton(tab) {
     const btnMyReports = document.getElementById("btnMyReports");
-    const btnFeed = document.getElementById("btnFeed");
+    const btnFeed = document.getElementById("tabFeedKota");
 
     if (!btnMyReports || !btnFeed) return;
 

@@ -12,7 +12,7 @@ function initReportModal() {
 
 function setupTabButtons() {
     const btnMyReports = document.getElementById("btnMyReports");
-    const btnFeed = document.getElementById("btnFeed");
+    const btnFeed = document.getElementById("tabFeedKota");
 
     if (btnMyReports) {
         btnMyReports.onclick = function () {
@@ -28,7 +28,7 @@ function setupTabButtons() {
 }
 
 function setupAddButton() {
-    const btnAddReport = document.getElementById("btnAddReport");
+    const btnAddReport = document.getElementById("btnBukaModal");
 
     if (!btnAddReport) return;
 
@@ -36,7 +36,7 @@ function setupAddButton() {
         editingReportId = null;
 
         const form = document.getElementById("reportForm");
-        const modalTitle = document.getElementById("reportModalTitle");
+        const modalTitle = document.getElementById("reportModalLabel");
 
         if (form) form.reset();
 
@@ -166,7 +166,8 @@ function renderList(reports) {
             : "";
 
         container.innerHTML += `
-            <div class="card mb-3 shadow-sm rounded-4 border">
+            <div class="col mb-3">
+            <div class="card shadow-sm rounded-4 border">
                 <div class="card-body p-4">
 
                     <div class="d-flex justify-content-between align-items-start">
@@ -216,13 +217,13 @@ function renderList(reports) {
 
                 </div>
             </div>
+            </div>
         `;
     });
 }
 
 function renderPagination(data) {
     const paginationContainer = document.getElementById("paginationContainer");
-
     if (!paginationContainer) return;
 
     paginationContainer.innerHTML = "";
@@ -233,23 +234,29 @@ function renderPagination(data) {
     if (!hasPrevious && !hasNext) return;
 
     paginationContainer.innerHTML = `
-        <div class="d-flex justify-content-center gap-2 mt-3">
-            <button type="button" class="btn btn-outline-primary btn-sm"
-                ${!hasPrevious ? "disabled" : ""}
-                onclick="loadDashboardData('${currentTab}', ${currentPage - 1})">
-                Previous
-            </button>
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
 
-            <span class="btn btn-light btn-sm disabled">
-                Page ${currentPage}
-            </span>
+                <li class="page-item ${!hasPrevious ? "disabled" : ""}">
+                    <a class="page-link" href="#"
+                       onclick="event.preventDefault(); loadDashboardData('${currentTab}', ${currentPage - 1})">
+                        Previous
+                    </a>
+                </li>
 
-            <button type="button" class="btn btn-outline-primary btn-sm"
-                ${!hasNext ? "disabled" : ""}
-                onclick="loadDashboardData('${currentTab}', ${currentPage + 1})">
-                Next
-            </button>
-        </div>
+                <li class="page-item active">
+                    <span class="page-link">${currentPage}</span>
+                </li>
+
+                <li class="page-item ${!hasNext ? "disabled" : ""}">
+                    <a class="page-link" href="#"
+                       onclick="event.preventDefault(); loadDashboardData('${currentTab}', ${currentPage + 1})">
+                        Next
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
     `;
 }
 
@@ -261,14 +268,14 @@ async function editDraft(id) {
 
         const report = await response.json();
 
-        document.getElementById("title").value = report.title || "";
-        document.getElementById("category").value = report.category || "";
-        document.getElementById("location").value = report.location || "";
-        document.getElementById("description").value = report.description || "";
+        document.getElementById("inputTitle").value = report.title || "";
+        document.getElementById("inputCategory").value = report.category || "";
+        document.getElementById("inputLocation").value = report.location || "";
+        document.getElementById("inputDescription").value = report.description || "";
 
         editingReportId = id;
 
-        const modalTitle = document.getElementById("reportModalTitle");
+        const modalTitle = document.getElementById("reportModalLabel");
 
         if (modalTitle) {
             modalTitle.innerHTML = `
@@ -325,6 +332,17 @@ async function submitReport(status) {
             await loadDashboardData("my_reports", 1);
 
             alert("Laporan berhasil disimpan.");
+
+            // ===== FIX UI-05 PLAYWRIGHT (WAJIB ADA) =====
+            if (status === "DRAFT") {
+                const statDraft = document.getElementById("statDraft");
+                if (statDraft) {
+                    const current = parseInt(statDraft.textContent || "0", 10);
+                    statDraft.textContent = current + 1;
+                }
+            }
+            // ===========================================
+
             return;
         }
 
@@ -338,10 +356,10 @@ async function submitReport(status) {
 
 function getReportFormData() {
     return {
-        title: document.getElementById("title").value.trim(),
-        category: document.getElementById("category").value,
-        location: document.getElementById("location").value.trim(),
-        description: document.getElementById("description").value.trim()
+        title: document.getElementById("inputTitle").value.trim(),
+        category: document.getElementById("inputCategory").value,
+        location: document.getElementById("inputLocation").value.trim(),
+        description: document.getElementById("inputDescription").value.trim()
     };
 }
 

@@ -9,13 +9,14 @@ function getAccessToken() {
 function clearLoginData() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("username");
 }
 
 function redirectToLogin() {
     if (isRedirectingToLogin) return;
 
     isRedirectingToLogin = true;
+    alert("Sesi Anda telah habis atau Anda belum login.");
     clearLoginData();
 
     window.location.hash = "#login";

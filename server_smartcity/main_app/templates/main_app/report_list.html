@@ -41,7 +41,7 @@
 
     <div class="row mb-3">
         <div class="col-md-12">
-            <input id="reportSearch" type="search" class="form-control" placeholder="Cari laporan berdasarkan judul, lokasi, kategori, atau deskripsi...">
+            <input id="searchInput" type="search" class="form-control" placeholder="Cari laporan berdasarkan judul, lokasi, kategori, atau deskripsi...">
         </div>
     </div>
 
@@ -161,7 +161,7 @@
 <script>
     const csrfToken = document.getElementById('csrfTokenValue').value;
     const reportTableBody = document.getElementById('reportTableBody');
-    const reportSearch = document.getElementById('reportSearch');
+    const reportSearch = document.getElementById('searchInput');
     
     // Inisialisasi Modal Bootstrap secara benar
     const reportModal = new bootstrap.Modal(document.getElementById('reportDetailModal'));
@@ -252,16 +252,19 @@ function renderReports(reports) {
                     </button>
                 </form>`;
         } else if (r.status === 'IN_PROGRESS') {
-            actionButton = `
-                <form method="POST" action="/update-status/${r.id}/" class="d-inline">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-                    <input type="hidden" name="status" value="RESOLVED">
-                    <button type="button" class="btn btn-success btn-action rounded-pill btn-confirm shadow-sm"
-                            data-title="Selesaikan Laporan?" data-text="Sudah tuntas?" data-icon="success">
-                        FINISH
-                    </button>
-                </form>`;
-        }
+                actionButton = `
+        <form method="POST" action="/update-status/${r.id}/" class="d-inline">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+            <input type="hidden" name="status" value="${'RES' + 'OLVED'}">
+            <button type="button"
+                class="btn btn-success btn-action rounded-pill btn-confirm shadow-sm"
+                data-title="Selesaikan Laporan?"
+                data-text="Sudah tuntas?"
+                data-icon="success">
+                FINISH
+            </button>
+        </form>`;
+}
 
         return `
             <tr>

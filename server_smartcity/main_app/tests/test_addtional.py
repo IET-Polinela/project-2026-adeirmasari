@@ -3,6 +3,8 @@ from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from main_app.models import Report
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -49,7 +51,7 @@ class SerializerAndModelCoverageTests(APITestCase):
         Menguji serializer tanpa menyertakan request dalam context,
         sehingga is_owner mengembalikan False.
         """
-        from mainapp.serializers import ReportSerializer
+        from main_app.serializers import ReportSerializer
         report = Report.objects.create(
             title='Laporan Serializer Uji',
             category='Lainnya',

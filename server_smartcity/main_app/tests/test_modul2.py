@@ -186,7 +186,20 @@ class PrivacyAndDataHidingTests(APITestCase):
             Ini merupakan teknik keamanan "security through obscurity" — sistem
             berpura-pura data tidak ada, bukan mengatakan "akses ditolak".
         """
-        raise NotImplementedError("Skenario PRIV-03 belum diimplementasi!")
+        # LANGKAH 1: Autentikasi sebagai Warga A
+        self.client.force_authenticate(user=self.warga_a)
+
+        # LANGKAH 2: Akses detail draf milik Warga B menggunakan ID-nya
+        url = f'/api/report/{self.draft_milik_b.pk}/'
+        response = self.client.get(url)
+
+        # LANGKAH 3: Verifikasi sistem menyembunyikan data dengan 404
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_404_NOT_FOUND,
+            "Warga A seharusnya tidak bisa melihat draf milik Warga B "
+            "(harus mendapat HTTP 404, bukan 403)"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────
     # PRIV-04: Warga A Tidak Bisa Memodifikasi Draf Milik Warga B
@@ -208,4 +221,34 @@ class PrivacyAndDataHidingTests(APITestCase):
             Jadi bahkan operasi PUT pun tidak bisa menemukan objek tersebut
             dalam queryset, menghasilkan 404.
         """
-        raise NotImplementedError("Skenario PRIV-04 belum diimplementasi.")
+        # LANGKAH 1: Autentikasi sebagai Warga A
+        self.client.force_authenticate(user=self.warga_a)
+
+        # LANGKAH 2: Siapkan payload PUT untuk mengubah judul draf milik Warga B
+        url = f'/api/report/{self.draft_milik_b.pk}/'
+        payload = {
+            'title': 'Judul Diubah Paksa oleh Warga A',
+            'category': self.draft_milik_b.category,
+            'description': self.draft_milik_b.description,
+            'location': self.draft_milik_b.location,
+            'status': 'DRAFT',
+        }
+
+        # LANGKAH 3: Kirim request PUT
+        response = self.client.put(url, payload, format='json')
+
+        # LANGKAH 4: Verifikasi permintaan ditolak dengan 404
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_404_NOT_FOUND,
+            "Warga A seharusnya tidak bisa memodifikasi draf milik Warga B "
+            "(harus mendapat HTTP 404)"
+        )
+
+        # LANGKAH 5: Pastikan data asli di database TIDAK berubah sama sekali
+        self.draft_milik_b.refresh_from_db()
+        self.assertEqual(
+            self.draft_milik_b.title,
+            'Draf Rahasia Warga B',
+            "Judul draf milik Warga B tidak boleh berubah sama sekali di database"
+        )

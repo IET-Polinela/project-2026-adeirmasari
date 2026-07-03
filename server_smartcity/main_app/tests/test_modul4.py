@@ -67,7 +67,40 @@ class CRUDAndValidationTests(APITestCase):
             reporter dengan request.user, sehingga warga tidak perlu
             mengirim field reporter secara manual.
         """
-        raise NotImplementedError("Skenario FT-01 belum diimplementasi.")
+        # LANGKAH 1: Tentukan URL endpoint create (basename 'report' dari router)
+        url = reverse('report-list')
+
+        # LANGKAH 2: Siapkan payload lengkap
+        payload = {
+            'title': 'Lampu Jalan Mati Total',
+            'category': 'Fasilitas Umum',
+            'description': 'Lampu jalan di depan gerbang kampus mati sejak 3 hari lalu.',
+            'location': 'Gerbang Utama Kampus',
+        }
+
+        # LANGKAH 3: Kirim POST request
+        response = self.client.post(url, payload, format='json')
+
+        # LANGKAH 4: Verifikasi status HTTP 201 Created
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+            "Laporan dengan data lengkap seharusnya berhasil dibuat (HTTP 201)"
+        )
+
+        # LANGKAH 5: Verifikasi data benar-benar tersimpan di database
+        self.assertTrue(
+            Report.objects.filter(title='Lampu Jalan Mati Total').exists(),
+            "Laporan baru harus tersimpan di database"
+        )
+
+        # LANGKAH 6: Verifikasi reporter otomatis terisi dengan user yang login
+        laporan = Report.objects.get(title='Lampu Jalan Mati Total')
+        self.assertEqual(
+            laporan.reporter,
+            self.warga,
+            "Field reporter harus otomatis terisi dengan user yang membuat laporan"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────
     # FT-02: Laporan Ditolak Jika Judul Kosong
@@ -89,7 +122,38 @@ class CRUDAndValidationTests(APITestCase):
             tidak memiliki blank=True dan null=True. Field `title` dengan
             max_length=200 tanpa blank=True akan di-reject jika kosong.
         """
-        raise NotImplementedError("Skenario FT-02 belum diimplementasi.")
+        # LANGKAH 1: Tentukan URL endpoint create
+        url = reverse('report-list')
+
+        # LANGKAH 2: Payload TANPA field 'title'
+        payload = {
+            'category': 'Fasilitas Umum',
+            'description': 'Deskripsi laporan tanpa judul.',
+            'location': 'Lokasi Uji Coba',
+        }
+
+        # LANGKAH 3: Kirim POST request
+        response = self.client.post(url, payload, format='json')
+
+        # LANGKAH 4: Verifikasi status HTTP 400 Bad Request
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            "Laporan tanpa judul (title) seharusnya ditolak dengan HTTP 400"
+        )
+
+        # LANGKAH 5: Verifikasi pesan error menyebutkan field 'title'
+        self.assertIn(
+            'title',
+            response.data,
+            "Respons error harus menyebutkan bahwa field 'title' wajib diisi"
+        )
+
+        # LANGKAH 6: Pastikan tidak ada data yang tersimpan di database
+        self.assertFalse(
+            Report.objects.filter(location='Lokasi Uji Coba').exists(),
+            "Tidak boleh ada laporan yang tersimpan jika validasi gagal"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────
     # FT-03: Laporan Ditolak Jika Deskripsi Kosong
@@ -105,7 +169,38 @@ class CRUDAndValidationTests(APITestCase):
         HASIL YANG DIHARAPKAN:
             Sistem menolak input dan mengembalikan HTTP 400 Bad Request.
         """
-        raise NotImplementedError("Skenario FT-03 belum diimplementasi.")
+        # LANGKAH 1: Tentukan URL endpoint create
+        url = reverse('report-list')
+
+        # LANGKAH 2: Payload TANPA field 'description'
+        payload = {
+            'title': 'Laporan Tanpa Deskripsi',
+            'category': 'Fasilitas Umum',
+            'location': 'Lokasi Uji Coba Deskripsi',
+        }
+
+        # LANGKAH 3: Kirim POST request
+        response = self.client.post(url, payload, format='json')
+
+        # LANGKAH 4: Verifikasi status HTTP 400 Bad Request
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            "Laporan tanpa deskripsi (description) seharusnya ditolak dengan HTTP 400"
+        )
+
+        # LANGKAH 5: Verifikasi pesan error menyebutkan field 'description'
+        self.assertIn(
+            'description',
+            response.data,
+            "Respons error harus menyebutkan bahwa field 'description' wajib diisi"
+        )
+
+        # LANGKAH 6: Pastikan tidak ada data yang tersimpan di database
+        self.assertFalse(
+            Report.objects.filter(title='Laporan Tanpa Deskripsi').exists(),
+            "Tidak boleh ada laporan yang tersimpan jika validasi gagal"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────
     # FT-04: Keamanan dari Serangan XSS (Cross-Site Scripting)

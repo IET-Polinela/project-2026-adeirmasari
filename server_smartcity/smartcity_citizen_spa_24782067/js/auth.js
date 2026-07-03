@@ -34,6 +34,7 @@ function setupLoginForm() {
             if (response.ok && data && data.access) {
                 localStorage.setItem("access_token", data.access);
                 localStorage.setItem("refresh_token", data.refresh);
+                localStorage.setItem("username", username);
 
                 window.location.hash = "#dashboard";
                 return;
@@ -51,7 +52,7 @@ function setupLoginForm() {
 function logoutUser() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("username");
 
     window.location.hash = "#login";
 }

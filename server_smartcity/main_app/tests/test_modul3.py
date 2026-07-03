@@ -148,7 +148,36 @@ class WorkflowStateTests(APITestCase):
               2. obj.status == 'DRAFT'
             Karena status REPORTED != DRAFT, permission menolak dengan 403.
         """
-        raise NotImplementedError("Skenario WF-02 belum diimplementasi.")
+        # LANGKAH 1: Autentikasi sebagai pemilik laporan
+        self.client.force_authenticate(user=self.warga)
+
+        # LANGKAH 2: Siapkan payload PUT mencoba mengubah judul
+        url = f'/api/report/{self.laporan_reported.pk}/'
+        payload = {
+            'title': 'Judul Coba Diubah Padahal Sudah Reported',
+            'category': self.laporan_reported.category,
+            'description': self.laporan_reported.description,
+            'location': self.laporan_reported.location,
+            'status': 'REPORTED',
+        }
+
+        # LANGKAH 3: Kirim request PUT
+        response = self.client.put(url, payload, format='json')
+
+        # LANGKAH 4: Verifikasi ditolak dengan 403 Forbidden
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+            "Warga tidak boleh mengubah laporan yang sudah berstatus REPORTED"
+        )
+
+        # LANGKAH 5: Pastikan data di database tidak berubah
+        self.laporan_reported.refresh_from_db()
+        self.assertEqual(
+            self.laporan_reported.title,
+            'Saluran Air Tersumbat',
+            "Judul laporan REPORTED tidak boleh berubah sama sekali"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────
     # WF-05: Laporan RESOLVED Bersifat Read-Only
@@ -171,7 +200,36 @@ class WorkflowStateTests(APITestCase):
             laporan berstatus DRAFT milik sendiri. Status RESOLVED != DRAFT,
             sehingga semua operasi tulis (PUT/PATCH/DELETE) ditolak.
         """
-        raise NotImplementedError("Skenario WF-05 belum diimplementasi.")
+        # LANGKAH 1: Autentikasi sebagai pemilik laporan
+        self.client.force_authenticate(user=self.warga)
+
+        # LANGKAH 2: Siapkan payload PUT mencoba mengubah laporan RESOLVED
+        url = f'/api/report/{self.laporan_resolved.pk}/'
+        payload = {
+            'title': 'Coba Ubah Padahal Sudah Resolved',
+            'category': self.laporan_resolved.category,
+            'description': self.laporan_resolved.description,
+            'location': self.laporan_resolved.location,
+            'status': 'RESOLVED',
+        }
+
+        # LANGKAH 3: Kirim request PUT
+        response = self.client.put(url, payload, format='json')
+
+        # LANGKAH 4: Verifikasi ditolak dengan 403 Forbidden
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN,
+            "Laporan RESOLVED bersifat read-only, tidak boleh diubah siapa pun"
+        )
+
+        # LANGKAH 5: Pastikan data di database tidak berubah
+        self.laporan_resolved.refresh_from_db()
+        self.assertEqual(
+            self.laporan_resolved.title,
+            'AC Rusak di Lab',
+            "Judul laporan RESOLVED tidak boleh berubah sama sekali"
+        )
 
 
 # =============================================================================
@@ -237,7 +295,27 @@ class AdminWorkflowTests(TestCase):
             yang diminta ada di dalam daftar allowed_transitions sebelum
             menyimpan perubahan ke database.
         """
-        raise NotImplementedError("Skenario WF-03 belum diimplementasi.")
+        # LANGKAH 1: Login sebagai admin (session-based auth, portal monolitik)
+        self.client.login(username='admin_portal', password='AdminPass123!')
+
+        # LANGKAH 2: Kirim POST untuk mengubah status REPORTED -> VERIFIED
+        url = reverse('update_status', kwargs={'pk': self.laporan_reported.pk})
+        response = self.client.post(url, {'status': 'VERIFIED'})
+
+        # LANGKAH 3: View ini melakukan redirect setelah sukses, jadi 302 valid
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_200_OK, status.HTTP_302_FOUND],
+            "Perubahan status oleh admin seharusnya berhasil (200 atau 302)"
+        )
+
+        # LANGKAH 4: Pastikan status benar-benar berubah di database
+        self.laporan_reported.refresh_from_db()
+        self.assertEqual(
+            self.laporan_reported.status,
+            'VERIFIED',
+            "Status laporan di database harus berubah menjadi 'VERIFIED'"
+        )
 
     # ─────────────────────────────────────────────────────────────────────────
     # WF-04: Tidak Ada Tombol Langsung ke RESOLVED dari REPORTED
@@ -263,4 +341,26 @@ class AdminWorkflowTests(TestCase):
               - IN_PROGRESS -> [RESOLVED]        (hanya RESOLVED)
             Ini memastikan laporan tidak bisa "lompat" status.
         """
-        raise NotImplementedError("Skenario WF-04 belum diimplementasi.")
+        # LANGKAH 1: Login sebagai admin untuk bisa melihat halaman daftar laporan
+        self.client.login(username='admin_portal', password='AdminPass123!')
+
+        # LANGKAH 2: Buka halaman daftar laporan (tempat tombol aksi status berada)
+        url = reverse('report_list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        content = response.content.decode()
+
+        # LANGKAH 3: Untuk laporan berstatus REPORTED, tombol yang muncul
+        # hanya boleh mengarah ke VERIFIED, TIDAK boleh langsung ke RESOLVED
+        self.assertIn(
+            'value="VERIFIED"',
+            content,
+            "Tombol transisi ke VERIFIED harus tersedia untuk laporan REPORTED"
+        )
+        self.assertNotIn(
+            'value="RESOLVED"',
+            content,
+            "Tidak boleh ada tombol yang langsung mengubah status REPORTED "
+            "menjadi RESOLVED (harus melalui VERIFIED -> IN_PROGRESS dahulu)"
+        )

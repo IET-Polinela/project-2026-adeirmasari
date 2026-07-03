@@ -124,7 +124,7 @@
                 Smart City Portal
             </a>
 
-            <div id="nav-menu" class="ms-auto"></div>
+            <div id="nav-menus" class="ms-auto"></div>
 
         </div>
     </nav>
@@ -173,7 +173,7 @@
                             Judul Laporan
                         </label>
                         <input type="text"
-                               id="title"
+                               id="inputTitle"
                                class="form-control"
                                required>
                     </div>
@@ -183,10 +183,11 @@
                         <label class="form-label fw-bold">
                             Kategori
                         </label>
-                        <select id="category"
+                        <select id="inputCategory"
                                 class="form-select"
                                 required>
                             <option value="">Pilih Kategori</option>
+                            <option value="infrastruktur">Infrastruktur</option>
                             <option value="Jalan Rusak">Jalan Rusak</option>
                             <option value="Drainase">Drainase</option>
                             <option value="Sampah">Sampah</option>
@@ -200,7 +201,7 @@
                             Lokasi
                         </label>
                         <input type="text"
-                               id="location"
+                               id="inputLocation"
                                class="form-control"
                                required>
                     </div>
@@ -210,7 +211,7 @@
                         <label class="form-label fw-bold">
                             Deskripsi
                         </label>
-                        <textarea id="description"
+                        <textarea id="inputDescription"
                                   class="form-control"
                                   rows="4"
                                   required></textarea>
